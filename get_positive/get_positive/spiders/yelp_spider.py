@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from items import YelpItem
+from get_positive.get_positive.items import YelpItem
 from datetime import datetime, timedelta
 import re
 from scrapy.selector import HtmlXPathSelector
@@ -11,8 +11,8 @@ class yelp_spider(CrawlSpider):
   name = 'yelp_spider'
   allowed_domains = ['yelp.com']
 
-  def __init__(self, *args, **kwargs): 
-    super(yelp_spider, self).__init__(*args, **kwargs) 
+  def __init__(self, *args, **kwargs):
+    super(yelp_spider, self).__init__(*args, **kwargs)
     self.start_urls = [kwargs.get('start_url')]
     self.start_page = kwargs.get('page_num')
     self.page_num = kwargs.get('page_num')
@@ -35,7 +35,7 @@ class yelp_spider(CrawlSpider):
       # Get reviews/ratings on current page
       page_reviews = response.xpath('//div[@class="review-content"]/p[@itemprop="description"]').extract()
       ratings = response.xpath('//meta[@itemprop="ratingValue"]').extract()
-     
+
       for i in range(len(page_reviews)):
         yield self.parse_review(page_reviews[i], ratings[i+1])
 

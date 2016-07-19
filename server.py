@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, render_template, request
 from modelAPI import *
 import time
+from get_positive.get_positive.BeginScrape import scrapeReviews
+from get_positive.get_positive.ScrapeReviewCounts import getReviewCount
 
 NUM_REVIEWS = 5
 app = Flask(__name__)
@@ -16,7 +18,8 @@ def appMain():
   # Perhaps a step here where we check if the data is already in Mongo
 
   # Begin by scraping the reviews
-  rest_id = scrape(url)
+  rest_id = getReviewCount(url)
+  scrapeReviews(url)
 
   # Train model
   # train(rest_id)
@@ -30,10 +33,6 @@ def appMain():
   time.sleep(3)
 
   return render_template('app.html', score=score, reviews=reviews, plates=plates, stars=stars)
-
-def scrape(url):
-  # This is where we would make the scraper scrape stuff
-  pass
 
 @app.route('/loading')
 def loading():
