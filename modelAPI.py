@@ -11,8 +11,17 @@ def get_score(rest_id, keyword=None):
         return get_term_score(keyword, model)
 
 
+def score_reviews(model):
+    return 0
+
+
 def get_top_reviews(rest_id, max_count, keyword=None):
-    return {'creation_date': '1/1/2000', 'review_text': 'good chicken', 'num_stars': 5};
+    model = get_model(rest_id)
+    reviews = []
+    # for review in model[]
+
+    return {'creation_date': '1/1/2000', 'review_text': 'good chicken', 'num_stars': 5}
+
 
 
 def get_plates():
@@ -40,16 +49,11 @@ def get_term_score(term, model):
         model['P_5_counts'][term] = 0
 
     total_count = model['P_1_counts'][term] + model['P_1_5_counts'][term] + model['P_2_counts'][term] + \
-                  model['P_2_5_counts'][term] + model['P_3_counts'][term] + \
-                  model['P_3_5_counts'][term] + model['P_4_counts'][term] + model['P_4_5_counts'][term] + \
-                  model['P_5_counts'][term]
+                  model['P_2_5_counts'][term] + model['P_3_counts'][term] + model['P_3_5_counts'][term] + \
+                  model['P_4_counts'][term] + model['P_4_5_counts'][term] + model['P_5_counts'][term]
     score_sum = model['P_1_counts'][term] + 1.5 * model['P_1_5_counts'][term] + 2 * model['P_2_counts'][term] + 2.5 * \
-                                                                                                                model[
-                                                                                                                    'P_2_5_counts'][
-                                                                                                                    term] + \
-                3 * model['P_3_counts'][term] + 3.5 * model['P_3_5_counts'][term] + 4 * model['P_4_counts'][
-        term] + 4.5 * model['P_4_5_counts'][term] + \
-                5 * model['P_5_counts'][term]
+                model['P_2_5_counts'][term] + 3 * model['P_3_counts'][term] + 3.5 * model['P_3_5_counts'][term] + 4 * \
+                model['P_4_counts'][term] + 4.5 * model['P_4_5_counts'][term] + 5 * model['P_5_counts'][term]
     if total_count != 0:
         return score_sum / total_count
     else:
@@ -72,8 +76,8 @@ def get_top_plates(rest_id, max_count, keyword=None):
 def get_review_distribution(rest_id, keyword=None):
     model = get_model(rest_id)
     if not keyword:
-        return {'1': len(model['1.0']), '2': len(model['2.0']), '3': len(model['3.0']), '4': len(model['4.0']),
-                '5': len(model['5.0'])}
+        return {'1': len(model['1_0']), '2': len(model['2_0']), '3': len(model['3_0']), '4': len(model['4_0']),
+                '5': len(model['5_0'])}
 
 
 # Trains a multinomial event model for restaurants' reviews
@@ -83,69 +87,78 @@ def train_general_model():
 
 # Returns total number of reviews for a restaurant
 def get_num_reviews(retrieved_model):
-    return len(retrieved_model["1.0"]) + len(retrieved_model["1.5"]) + len(retrieved_model["2.0"]) + \
-           len(retrieved_model["2.5"]) + len(retrieved_model["3.0"]) + len(retrieved_model["3.5"]) + \
-           len(retrieved_model["4.0"]) + len(retrieved_model["4.5"]) + len(retrieved_model["5.0"])
+    return len(retrieved_model["1_0"]) + len(retrieved_model["1_5"]) + len(retrieved_model["2_0"]) + \
+           len(retrieved_model["2_5"]) + len(retrieved_model["3_0"]) + len(retrieved_model["3_5"]) + \
+           len(retrieved_model["4_0"]) + len(retrieved_model["4_5"]) + len(retrieved_model["5_0"])
 
 
 def train_model(retrieved_model):
     num_reviews = get_num_reviews(retrieved_model)
 
     # compute prior probabilities
-    retrieved_model['P_1_prior'] = len(retrieved_model['1.0']) / num_reviews
-    retrieved_model['P_1_5_prior'] = len(retrieved_model['1.5']) / num_reviews
-    retrieved_model['P_2_prior'] = len(retrieved_model['2.0']) / num_reviews
-    retrieved_model['P_2_5_prior'] = len(retrieved_model['2.5']) / num_reviews
-    retrieved_model['P_3_prior'] = len(retrieved_model['3.0']) / num_reviews
-    retrieved_model['P_3_5_prior'] = len(retrieved_model['3.5']) / num_reviews
-    retrieved_model['P_4_prior'] = len(retrieved_model['4.0']) / num_reviews
-    retrieved_model['P_4_5_prior'] = len(retrieved_model['4.5']) / num_reviews
-    retrieved_model['P_5_prior'] = len(retrieved_model['5.0']) / num_reviews
+    retrieved_model['P_1_prior'] = len(retrieved_model['1_0']) / num_reviews
+    retrieved_model['P_1_5_prior'] = len(retrieved_model['1_5']) / num_reviews
+    retrieved_model['P_2_prior'] = len(retrieved_model['2_0']) / num_reviews
+    retrieved_model['P_2_5_prior'] = len(retrieved_model['2_5']) / num_reviews
+    retrieved_model['P_3_prior'] = len(retrieved_model['3_0']) / num_reviews
+    retrieved_model['P_3_5_prior'] = len(retrieved_model['3_5']) / num_reviews
+    retrieved_model['P_4_prior'] = len(retrieved_model['4_0']) / num_reviews
+    retrieved_model['P_4_5_prior'] = len(retrieved_model['4_5']) / num_reviews
+    retrieved_model['P_5_prior'] = len(retrieved_model['5_0']) / num_reviews
 
     # compute posterior probabilities
     retrieved_model['P_1_counts']['total_count'] = 0
-    for review in retrieved_model['1.0']:
+    for review in retrieved_model['1_0']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_1_counts'][term] = retrieved_model['P_1_counts'].get(term, 0) + 1
             retrieved_model['P_1_counts']['total_count'] += 1
         retrieved_model['P_1_5_counts']['total_count'] = 0
-    for review in retrieved_model['1.5']:
+    for review in retrieved_model['1_5']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_1_5_counts'][term] = retrieved_model['P_1_5_counts'].get(term, 0) + 1
             retrieved_model['P_1_5_counts']['total_count'] += 1
     retrieved_model['P_2_counts']['total_count'] = 0
-    for review in retrieved_model['2.0']:
+    for review in retrieved_model['2_0']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_2_counts'][term] = retrieved_model['P_2_counts'].get(term, 0) + 1
             retrieved_model['P_2_counts']['total_count'] += 1
     retrieved_model['P_2_5_counts']['total_count'] = 0
-    for review in retrieved_model['2.5']:
+    for review in retrieved_model['2_5']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_2_5_counts'][term] = retrieved_model['P_2_5_counts'].get(term, 0) + 1
             retrieved_model['P_2_5_counts']['total_count'] += 1
     retrieved_model['P_3_counts']['total_count'] = 0
-    for review in retrieved_model['3.0']:
+    for review in retrieved_model['3_0']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_3_counts'][term] = retrieved_model['P_3_counts'].get(term, 0) + 1
             retrieved_model['P_3_counts']['total_count'] += 1
     retrieved_model['P_3_5_counts']['total_count'] = 0
-    for review in retrieved_model['3.5']:
+    for review in retrieved_model['3_5']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_3_5_counts'][term] = retrieved_model['P_3_5_counts'].get(term, 0) + 1
             retrieved_model['P_3_5_counts']['total_count'] += 1
     retrieved_model['P_4_counts']['total_count'] = 0
-    for review in retrieved_model['4.0']:
+    for review in retrieved_model['4_0']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_4_counts'][term] = retrieved_model['P_4_counts'].get(term, 0) + 1
             retrieved_model['P_4_counts']['total_count'] += 1
     retrieved_model['P_4_5_counts']['total_count'] = 0
-    for review in retrieved_model['4.5']:
+    for review in retrieved_model['4_5']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_4_5_counts'][term] = retrieved_model['P_4_5_counts'].get(term, 0) + 1
             retrieved_model['P_4_5_counts']['total_count'] += 1
     retrieved_model['P_5_counts']['total_count'] = 0
-    for review in retrieved_model['5.0']:
+    for review in retrieved_model['5_0']:
         for term in review.split():
+            term = str(term).replace(".", "")
             retrieved_model['P_5_counts'][term] = retrieved_model['P_5_counts'].get(term, 0) + 1
             retrieved_model['P_5_counts']['total_count'] += 1
     return retrieved_model
@@ -160,15 +173,15 @@ def get_model(restaurant):
     # if a model doesn't exist, it trains one
     if not mongo.get_restaurant_model(restaurant):
         # initialize model
-        retrieved_model['1.0'] = []
-        retrieved_model['1.5'] = []
-        retrieved_model['2.0'] = []
-        retrieved_model['2.5'] = []
-        retrieved_model['3.0'] = []
-        retrieved_model['3.5'] = []
-        retrieved_model['4.0'] = []
-        retrieved_model['4.5'] = []
-        retrieved_model['5.0'] = []
+        retrieved_model['1_0'] = []
+        retrieved_model['1_5'] = []
+        retrieved_model['2_0'] = []
+        retrieved_model['2_5'] = []
+        retrieved_model['3_0'] = []
+        retrieved_model['3_5'] = []
+        retrieved_model['4_0'] = []
+        retrieved_model['4_5'] = []
+        retrieved_model['5_0'] = []
         retrieved_model['P_1_prior'] = 0.0
         retrieved_model['P_1_5_prior'] = 0.0
         retrieved_model['P_2_prior'] = 0.0
@@ -190,10 +203,14 @@ def get_model(restaurant):
 
         # process reviews
         for review in data:
-            retrieved_model[str(review['rating'])].append(review['body'])
+            rating = str(review['rating']).replace('.', '_')
+            retrieved_model[rating].append(review['body'])
 
         # train model
-        return train_model(retrieved_model)
+        trained_model = train_model(retrieved_model)
+        print "trained_model", trained_model
+        mongo.save_restaurant_model(restaurant, trained_model)
+        return trained_model
     else:
         return mongo.get_restaurant_model(restaurant)
 
