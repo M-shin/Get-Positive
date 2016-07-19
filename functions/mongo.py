@@ -31,6 +31,7 @@ def search_by_rating(rating):
 
 # returns a list of review objects which is for a certain restaurant
 def search_by_restaurant(restaurant):
+  # normalizes whitespace between words to 1 space
   restaurant = ' '.join(restaurant.split())
   cursor = get_all_reviews()
   results = []
