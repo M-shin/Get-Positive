@@ -38,9 +38,11 @@ P_5_counts = dict()
 # -------------------------------------------------------------
 
 
+# Returns a quality score for a given term
 def get_score(rest_id, keyword=None):
-    get_model("Fang")
-    return {'score': 0}
+    if keyword:
+        get_model(keyword)
+        return get_term_score(keyword)
 
 
 def get_top_reviews(rest_id, max_count, keyword=None):
@@ -172,24 +174,22 @@ def train_model():
             P_5_counts['total_count'] += 1
 
 
-# Retrieves model from DB
-def get_model(resaurant):
+# Returns a trained model
+def get_model(restaurant):
     # retrieve model from DB
-    data = mongo.search_by_restaurant(resaurant)
-    print 'data: ', data
+    data = mongo.search_by_restaurant(restaurant)
     for review in data:
         model[review['rating']].append(review['body'])
-        print "Review: ", review['body']
 
-    # train data
+    # train model
     train_model()
 
-def main():
-    get_model("Fang")
-    print "Model: ", model
-    train_model()
-    print 'Score: ', get_term_score('amazing')
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     get_model("Fang")
+#     print "Model: ", model
+#     train_model()
+#     print 'Score: ', get_term_score('amazing')
+#
+#
+# if __name__ == "__main__":
+#     main()
