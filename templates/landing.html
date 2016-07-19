@@ -2,3 +2,7 @@
 <title>Get Positive</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div> Hi this is our landing page </div>
+<form action="/scrape">
+  <input type="text" name="url" placeholder="yelp.com/...">
+  <input type="submit" value="Submit">
+</form>
