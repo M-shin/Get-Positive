@@ -31,11 +31,15 @@ def search_by_rating(rating):
 
 # returns a list of review objects which is for a certain restaurant
 def search_by_restaurant(restaurant):
+  restaurant = ' '.join(restaurant.split())
   cursor = get_all_reviews()
   results = []
 
   for item in cursor:
-    if restaurant.lower() == item['name'].lower():
+    item_name = ' '.join(item['name'].split())
+    if restaurant.lower() == item_name.lower():
       results.append(item)
 
   return results
+
+print search_by_restaurant('  Los   Hermanos      Taqueria ')
