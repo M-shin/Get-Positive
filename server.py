@@ -7,9 +7,11 @@ app = Flask(__name__)
 def index():
   return render_template('landing.html')
 
-@app.route('/app')
-def app():
-  return render_template('layout.html')
+@app.route('/scrape', methods=['GET'])
+def scrape():
+  url = request.args['url']
+  # This is where we would make the scraper scrape stuff
+  return render_template('app.html')
 
 @app.route('/score', methods=['GET'])
 def get_score():
