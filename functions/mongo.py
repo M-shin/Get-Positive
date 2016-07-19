@@ -4,8 +4,8 @@ import re
 # returns all restaurant objects in database
 # restaurant objects contain name, url, list of reviews, and menu items
 def get_all_restaurants():
-  client = MongoClient()
-  coll = client.mockDB.reviews
+  client = MongoClient('mongodb://172.20.9.140:27017')
+  coll = client.reviews_db.reviews
   cursor = coll.find()
   return list(cursor)
 
@@ -76,14 +76,14 @@ def search_by_restaurant(restaurant_query):
 
 # saves model parameters into restaurant objects
 def save_restaurant_model(name, model):
-  client = MongoClient()
-  coll = client.mockDB.reviews
+  client = MongoClient('mongodb://172.20.9.140:27017')
+  coll = client.reviews_db.reviews
   cursor = coll.update({'name': re.compile(name, re.IGNORECASE)}, {'$set': {'model': model}})  
 
 # returns model of a particular restaurant
 def get_restaurant_model(name):
-  client = MongoClient()
-  coll = client.mockDB.reviews
+  client = MongoClient('mongodb://172.20.9.140:27017')
+  coll = client.reviews_db.reviews
   cursor = coll.find({'name': re.compile(name, re.IGNORECASE)})
   if 'model' in cursor[0]:
     return cursor[0]['model']
