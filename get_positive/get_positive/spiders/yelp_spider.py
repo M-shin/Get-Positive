@@ -1,114 +1,77 @@
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from ter_scrape import items
+from items import YelpItem
 from datetime import datetime, timedelta
 import os
+import re
 from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
 
 HOME = os.environ['HOME']
-os.chdir(HOME + "/Desktop/github/hackathon/get_positive/get_positive") 
-
-# Method that gets today's date
-def date_today(dtnow):
-	now = dtnow
-	weekdays = ['Mon. ','Tue. ','Wed. ','Thu. ','Fri. ','Sat. ','Sun. ']
-	months = ['Jan. ','Feb. ','Mar. ','Apr. ','May. ', 'Jun. ','Jul. ','Aug. ','Sep. ','Oct. ','Nov. ','Dec. ']
-	backpage_date = weekdays[now.weekday()] + months[now.month-1] + str(now.day)
-	return backpage_date
-
-# Method that gets yesterday's date
-def date_yesterday(dtnow):
-	now = dtnow - timedelta(days=1)
-	weekdays = ['Mon. ','Tue. ','Wed. ','Thu. ','Fri. ','Sat. ','Sun. ']
-	months = ['Jan. ','Feb. ','Mar. ','Apr. ','May. ', 'Jun. ','Jul. ','Aug. ','Sep. ','Oct. ','Nov. ','Dec. ']
-	backpage_date = weekdays[now.weekday()] + months[now.month-1] + str(now.day)
-	return backpage_date
-
-# Open file which contains input urls
-# with open("test_urls.txt","rU") as infile:
-# 	urls = [row.strip("\n") for row in infile]
+os.chdir(HOME + "/Desktop/github/hackathon/Get-Positive/get_positive/get_positive") 
 
 class yelp_spider(CrawlSpider):
-	name = 'yelp_spider'
-	allowed_domains = ['yelp.com']
+  name = 'yelp_spider'
+  allowed_domains = ['yelp.com']
 
-	def __init__(self, *args, **kwargs): 
-		super(TERSpider, self).__init__(*args, **kwargs) 
+  def __init__(self, *args, **kwargs): 
+    super(yelp_spider, self).__init__(*args, **kwargs) 
+    self.start_urls = [kwargs.get('start_url')]
+    self.start_page = kwargs.get('page_num')
+    self.page_num = kwargs.get('page_num')
+    parts = self.start_urls[0].split('/')
+    self.restaurant_name = parts[len(parts)-1].split('?start')[0]
 
-		self.start_url = kwargs.get('start_url')
-		self.static_now = kwargs.get('today')
-		all_months = ['Jan. ','Feb. ','Mar. ','Apr. ','May. ', 'Jun. ','Jul. ','Aug. ','Sep. ','Oct. ','Nov. ','Dec. ']
-		all_weekdays = ['Mon. ','Tue. ','Wed. ','Thu. ','Fri. ','Sat. ','Sun. ']
-		now_day = self.static_now.weekday
-		now_month = self.static_now.month
-		self.all_dates = []
-		for day in all_weekdays:
-			for month in all_months:
-				if (day != now_day) and (month != now_month):
-					self.all_dates.append(day + month)
+    self.coll = kwargs.get('coll')
 
-	def login(self, response):
-		return [FormRequest.from_response(response,
-				formdata={'USERNAME': 'mprice09', 'PASSWORD': 'Ar@chn1d'},
-				callback=self.go_to_search)]
+    if self.coll.count({'name': self.restaurant_name}) > 0:
+      return
 
-	def go_to_search(self, response):
-		return Request(url="https://www.theeroticreview.com/reviews/index.asp",
-					callback=self.search)
+    self.coll.insert_one({
+        'name': self.restaurant_name,
+        'menuItems': [],
+        'reviews': [],
+        'url': self.start_urls[0].split('?start')[0]
+      })
 
-	def search(self, response):
-		return [FormRequest.from_response(response,
-				formdata={},
-				callback=self.parse)]
+  def parse(self,response):
 
-	def parse(self,response):
+    if response.status < 600:
+      # Get reviews/ratings on current page
+      page_reviews = response.xpath('//div[@class="review-content"]/p[@itemprop="description"]').extract()
+      ratings = response.xpath('//meta[@itemprop="ratingValue"]').extract()
+      for i in range(len(page_reviews)):
+        yield self.parse_review(page_reviews[i], ratings[i+1])
 
-		# Log in at beginning of scraping
-		hxs = HtmlXPathSelector(response)
-		if hxs.select("//form[@id='USERNAME']"):
-			return self.login(response)
+      # Paginate 5 pages
+      if response.xpath('//span[@class="pagination-label responsive-hidden-small pagination-links_anchor"]') and (self.page_num - self.start_page) <= 100:
+        self.page_num += 20
+        base_url = self.start_urls[0].split('?start=')[0]
+        yield scrapy.Request(base_url + '?start=' + str(self.page_num), callback=self.parse)
 
-		if response.status < 600:
-			todays_links = []
-			
-			date = date_today(self.static_now)
-			yesterday_date = date_yesterday(self.static_now)
+    else:
+      time.sleep(10)
+      yield scrapy.Request(response.url,callback=self.parse)
 
-			if date in response.body:
-				
-				if any(date in response.body for date in self.all_dates):
-					# Get all URLs as long as we are on the last page for today
-					todays_links = response.xpath("//div[@class='date'][1]/following-sibling::div[@class='date'][1]/preceding-sibling::div[preceding-sibling::div[@class='date']][contains(@class, 'cat')]/a/@href").extract()
-				
-				if len(todays_links) == 0:
-					# Page is entirely today's links, get all links until end of current page's listings
-					todays_links = response.xpath("//div[@class='date'][1]/following-sibling::div[@class='secondPaginationFooter'][1]/preceding-sibling::div[preceding-sibling::div[@class='date']][contains(@class, 'cat')]/a/@href").extract()
+  # Parse page
+  def parse_review(self, review, rating):
+    clean_review = re.sub(r'<p itemprop="description".+?>', '', review.replace('</p>', ''))
+    clean_rating = float(rating.split('content')[1][2:5])
 
-				for url in todays_links: 			
-				# Iterate through an ad		
-					yield scrapy.Request(url,callback=self.parse_ad_into_content)
+    self.coll.update_one(
+      {'name': self.restaurant_name},
+      {'$push': {
+          'reviews': {
+            'body': clean_review,
+            'rating': clean_rating
+          }
+        }
+      }
+    )
 
-				if len(todays_links) == 300:
-					for url in set(response.xpath('//a[@class="pagination next"]/@href').extract()):
-					# End of page, crawl next page
-						yield scrapy.Request(url,callback=self.parse)
-
-		else:
-			time.sleep(10)
-			yield scrapy.Request(response.url,callback=self.parse)
-
-	# Parse page
-	def parse_ad_into_content(self,response):
-
-		item = items.TERScrapeItem(url=response.url,
-			backpage_id=response.url.split('.')[0].split('/')[2].encode('utf-8'),
-			text = response.body,
-			posting_body= response.xpath("//div[@class='postingBody']").extract()[0].encode('utf-8'),
-			date = str(datetime.utcnow()-timedelta(hours=6)),
-			posted_date = response.xpath("//div[@class='adInfo']/text()").extract()[0].encode('utf-8'),
-			posted_age = response.xpath("//p[@class='metaInfoDisplay']/text()").extract()[0].encode('utf-8'),
-			posted_title = response.xpath("//div[@id='postingTitle']//h1/text()").extract()[0].encode('utf-8')
-			)
-		return item
+    item = YelpItem(
+      body = clean_review,
+      rating = clean_rating
+    )
+    return item
