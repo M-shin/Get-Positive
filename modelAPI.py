@@ -4,7 +4,7 @@ from functions import mongo
 plates = []
 
 
-# Returns a quality score for a given term
+# Returns a quality score for a given term (-1 if term doesn't exist)
 def get_score(rest_id, keyword=None):
     if keyword:
         model = get_model(rest_id)
@@ -50,7 +50,10 @@ def get_term_score(term, model):
                 3 * model['P_3_counts'][term] + 3.5 * model['P_3_5_counts'][term] + 4 * model['P_4_counts'][
         term] + 4.5 * model['P_4_5_counts'][term] + \
                 5 * model['P_5_counts'][term]
-    return score_sum / total_count
+    if total_count != 0:
+        return score_sum / total_count
+    else:
+        return -1
 
 
 def get_top_plates(rest_id, max_count, keyword=None):
@@ -67,9 +70,10 @@ def get_top_plates(rest_id, max_count, keyword=None):
 
 
 def get_review_distribution(rest_id, keyword=None):
-    return {'1': len(model['1']), '2': len(model['2']), '3': len(model['3']), '4': len(model['4']),
-            '5': len(model['5'])}
-    # {'1': 3, '2': 13, '3': 27, '4': 293, '5': 36}
+    model = get_model(rest_id)
+    if not keyword:
+        return {'1': len(model['1.0']), '2': len(model['2.0']), '3': len(model['3.0']), '4': len(model['4.0']),
+                '5': len(model['5.0'])}
 
 
 # Trains a multinomial event model for restaurants' reviews
@@ -154,7 +158,7 @@ def get_model(restaurant):
     retrieved_model = dict()
 
     # if a model doesn't exist, it trains one
-    if 'model' not in data:
+    if not mongo.get_restaurant_model(restaurant):
         # initialize model
         retrieved_model['1.0'] = []
         retrieved_model['1.5'] = []
@@ -186,20 +190,19 @@ def get_model(restaurant):
 
         # process reviews
         for review in data:
-            retrieved_model[review['rating']].append(review['body'])
+            retrieved_model[str(review['rating'])].append(review['body'])
 
         # train model
         return train_model(retrieved_model)
     else:
-        return data['model']
+        return mongo.get_restaurant_model(restaurant)
 
 
-def main():
-    model = get_model("Fang")
-    print "Model: ", model
-    print "Score: ", get_score("Fang", "amazing")
-
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     model = get_model("Fang")
+#     print "Model: ", model
+#     print "Score: ", get_score("Fang", "guy")
+#     print "review_distribution: ", get_review_distribution("fang")
+#
+# if __name__ == "__main__":
+#     main()

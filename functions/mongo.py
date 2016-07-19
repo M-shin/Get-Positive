@@ -73,6 +73,7 @@ def search_by_restaurant(restaurant_query):
 
   return results
 
+
 # saves model parameters into restaurant objects
 def save_restaurant_model(name, model):
   client = MongoClient()
