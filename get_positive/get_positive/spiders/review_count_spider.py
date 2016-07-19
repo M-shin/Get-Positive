@@ -9,8 +9,7 @@ import re
 from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
 
-HOME = os.environ['HOME']
-os.chdir(HOME + "/Desktop/github/hackathon/Get-Positive/get_positive/get_positive") 
+os.chdir('../get_positive') 
 
 class review_count_spider(CrawlSpider):
   name = 'review_count_spider'

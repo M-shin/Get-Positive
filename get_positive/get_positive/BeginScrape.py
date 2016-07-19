@@ -35,4 +35,3 @@ def scrapeReviews(url, restaurant_name):
     num += 100
 
   process.start()
-
