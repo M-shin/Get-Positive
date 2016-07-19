@@ -9,9 +9,10 @@ from scrapy.utils.project import get_project_settings
 from datetime import datetime
 from pymongo import MongoClient
 
-url = 'https://www.yelp.com/biz/fang-san-francisco-2'
+# url = 'https://www.yelp.com/biz/fang-san-francisco-2'
 
-# Get the number of reviews
-process = CrawlerProcess(get_project_settings())
-process.crawl(review_count_spider, start_url=url)
-process.start()
+def getReviewCount(url):
+  # Get the number of reviews
+  process = CrawlerProcess(get_project_settings())
+  process.crawl(review_count_spider, start_url=url)
+  process.start()

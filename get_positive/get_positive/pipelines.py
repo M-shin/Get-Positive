@@ -7,7 +7,7 @@ class YelpPipeline(object):
     self.urls_seen = set()
 
   # def open_spider(self, spider):
-  	# print 'spider opened'
+    # print 'spider opened'
     # fileName = 'output.json'
     # self.file = open(fileName, 'wb')
 
