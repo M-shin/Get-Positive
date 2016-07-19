@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import re
 
 # returns all restaurant objects in database
 # restaurant objects contain name, url, list of reviews, and menu items
@@ -72,4 +73,17 @@ def search_by_restaurant(restaurant_query):
 
   return results
 
-print get_all_reviews()
+# saves model parameters into restaurant objects
+def save_restaurant_model(name, model):
+  client = MongoClient()
+  coll = client.mockDB.reviews
+  cursor = coll.update({'name': re.compile(name, re.IGNORECASE)}, {'$set': {'model': model}})  
+
+# returns model of a particular restaurant
+def get_restaurant_model(name):
+  client = MongoClient()
+  coll = client.mockDB.reviews
+  cursor = coll.find({'name': re.compile(name, re.IGNORECASE)})
+  if 'model' in cursor[0]:
+    return cursor[0]['model']
+  return None
