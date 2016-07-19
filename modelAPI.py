@@ -41,7 +41,7 @@ P_5_counts = dict()
 # Returns a quality score for a given term
 def get_score(rest_id, keyword=None):
     if keyword:
-        get_model(keyword)
+        get_model(rest_id)
         return get_term_score(keyword)
 
 
