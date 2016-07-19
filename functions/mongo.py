@@ -39,3 +39,5 @@ def search_by_restaurant(restaurant):
       results.append(item)
 
   return results
+
+print get_all_reviews()
