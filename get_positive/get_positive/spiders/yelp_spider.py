@@ -20,8 +20,6 @@ class yelp_spider(CrawlSpider):
     self.start_urls = [kwargs.get('start_url')]
     self.start_page = kwargs.get('page_num')
     self.page_num = kwargs.get('page_num')
-    parts = self.start_urls[0].split('/')
-    self.restaurant_name = parts[len(parts)-1].split('?start')[0]
 
     self.coll = kwargs.get('coll')
 
@@ -41,6 +39,7 @@ class yelp_spider(CrawlSpider):
       # Get reviews/ratings on current page
       page_reviews = response.xpath('//div[@class="review-content"]/p[@itemprop="description"]').extract()
       ratings = response.xpath('//meta[@itemprop="ratingValue"]').extract()
+     
       for i in range(len(page_reviews)):
         yield self.parse_review(page_reviews[i], ratings[i+1])
 
