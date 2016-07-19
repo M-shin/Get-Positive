@@ -11,7 +11,7 @@ from pymongo import MongoClient
 
 # url = 'https://www.yelp.com/biz/fang-san-francisco-2'
 
-def scrapeReviews(url):
+def scrapeReviews(url, restaurant_name):
 
   # Read in number of reviews
   numReviews = 0
@@ -28,7 +28,11 @@ def scrapeReviews(url):
   process.crawl(yelp_spider, start_url=url, coll=coll)
   num = 0
   while num < numReviews:
-    process.crawl(yelp_spider, start_url=(url + '?start=' + str(num)), coll=coll, page_num=num)
+    process.crawl(yelp_spider, start_url=(url + '?start=' + str(num)),
+                               coll=coll,
+                               page_num=num,
+                               restaurant_name=restaurant_name)
     num += 100
 
   process.start()
+
