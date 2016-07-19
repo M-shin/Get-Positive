@@ -1,10 +1,15 @@
 from pymongo import MongoClient
 
-# returns a list of review objects which contain a certain keyword
-def search_by_keyword(keyword):
+# returns all review objects in database
+def get_all_reviews():
   client = MongoClient()
   coll = client.mockDB.reviews
   cursor = coll.find()
+  return list(cursor)
+
+# returns a list of review objects which contain a certain keyword
+def search_by_keyword(keyword):
+  cursor = get_all_reviews()
   results = []
 
   for item in cursor:
@@ -15,9 +20,7 @@ def search_by_keyword(keyword):
 
 # returns a list of review objects which have a certain rating
 def search_by_rating(rating):
-  client = MongoClient()
-  coll = client.mockDB.reviews
-  cursor = coll.find()
+  cursor = get_all_reviews()
   results = []
 
   for item in cursor:
@@ -28,9 +31,7 @@ def search_by_rating(rating):
 
 # returns a list of review objects which is for a certain restaurant
 def search_by_restaurant(restaurant):
-  client = MongoClient()
-  coll = client.mockDB.reviews
-  cursor = coll.find()
+  cursor = get_all_reviews()
   results = []
 
   for item in cursor:
