@@ -24,6 +24,7 @@ def scrapeReviews(url, restaurant_name):
   client = MongoClient()
   db = client['reviews_db']
   coll = db['reviews']
+  
   process = CrawlerProcess(get_project_settings())
   process.crawl(yelp_spider, start_url=url, coll=coll)
   num = 0

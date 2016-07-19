@@ -3,12 +3,9 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from items import YelpItem
 from datetime import datetime, timedelta
-import os
 import re
 from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
-
-os.chdir('../get_positive') 
 
 class yelp_spider(CrawlSpider):
   name = 'yelp_spider'
