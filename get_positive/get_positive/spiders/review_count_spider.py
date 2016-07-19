@@ -3,13 +3,10 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from items import ReviewCountItem
 from datetime import datetime, timedelta
-import os
 from pymongo import MongoClient
 import re
 from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
-
-os.chdir('../get_positive') 
 
 class review_count_spider(CrawlSpider):
   name = 'review_count_spider'
