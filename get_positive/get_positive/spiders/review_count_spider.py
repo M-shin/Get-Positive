@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from items import ReviewCountItem
+from get_positive.get_positive.items import ReviewCountItem
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 import re
@@ -12,8 +12,8 @@ class review_count_spider(CrawlSpider):
   name = 'review_count_spider'
   allowed_domains = ['yelp.com']
 
-  def __init__(self, *args, **kwargs): 
-    super(review_count_spider, self).__init__(*args, **kwargs) 
+  def __init__(self, *args, **kwargs):
+    super(review_count_spider, self).__init__(*args, **kwargs)
     self.start_urls = [kwargs.get('start_url')]
 
   def parse(self,response):
