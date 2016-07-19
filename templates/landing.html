@@ -1,8 +1,18 @@
 <!doctype html>
-<title>Get Positive</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div> Hi this is our landing page </div>
-<form action="/main">
-  <input type="text" name="url" placeholder="yelp.com/...">
-  <input type="submit" value="Submit">
-</form>
+<html>
+  <head>
+    <title>Get Positive</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div id="loadingArea">
+      <div> Hi this is our landing page </div>
+      <form action="/main" onsubmit="handleSubmit()">
+        <input type="text" name="url" placeholder="yelp.com/...">
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='landing.js') }}"></script>
+</html>

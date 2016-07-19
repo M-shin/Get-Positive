@@ -27,11 +27,17 @@ def appMain():
   plates = modelAPI.get_top_plates(rest_id, NUM_REVIEWS)
   stars = modelAPI.get_review_distribution(rest_id)
 
+  time.sleep(3)
+
   return render_template('app.html', score=score, reviews=reviews, plates=plates, stars=stars)
 
 def scrape(url):
   # This is where we would make the scraper scrape stuff
   pass
+
+@app.route('/loading')
+def loading():
+  return render_template('loading.html')
 
 @app.route('/score', methods=['GET'])
 def get_score():
