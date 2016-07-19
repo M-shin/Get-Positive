@@ -31,11 +31,14 @@ def search_by_rating(rating):
 
 # returns a list of review objects which is for a certain restaurant
 def search_by_restaurant(restaurant):
+  # normalizes whitespace between words to 1 space
+  restaurant = ' '.join(restaurant.split())
   cursor = get_all_reviews()
   results = []
 
   for item in cursor:
-    if restaurant.lower() == item['name'].lower():
+    item_name = ' '.join(item['name'].split())
+    if restaurant.lower() == item_name.lower():
       results.append(item)
 
   return results
