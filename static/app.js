@@ -70,7 +70,7 @@ function populateReviewArea(stars) {
   });
 }
 
-function computePre(s, i) {
+function computePre(s, i, c=1) {
   var I = [s.lastIndexOf('.', i + 1), s.lastIndexOf('?', i + 1), s.lastIndexOf('!', i + 1)];
   I = I.filter(i => i > -1);
   if (I.length === 0) {
@@ -80,10 +80,13 @@ function computePre(s, i) {
   for (var i = 1; i < I.length; i++) {
     max = Math.max(max, I[i]);
   }
-  return max;
+  if (c <= 1) {
+    return max;
+  }
+  return computePre(s, max, c-1);
 }
 
-function computePost(s, i) {
+function computePost(s, i, c=1) {
   var I = [s.indexOf('.', i + 1), s.indexOf('?', i + 1), s.indexOf('!', i + 1)];
   I = I.filter(i => i > -1);
   if (I.length === 0) {
@@ -93,7 +96,10 @@ function computePost(s, i) {
   for (var i = 1; i < I.length; i++) {
     min = Math.min(min, I[i]);
   }
-  return min;
+  if (c <= 1){
+    return min;
+  }
+  return computePost(s, min, c-1);
 }
 
 function bold(s, i, l) {
@@ -111,10 +117,23 @@ function populateSRA(reviews) {
       var index = reviews[i].review_text.toLowerCase().indexOf(keyword);
       console.log(index);
       var pre = computePre(reviews[i].review_text, index);
-      var post = computePost(reviews[i].review_text, index);
-      reviews[i].review_text = reviews[i].review_text.slice(pre + 1, post);
+      if (pre == 0) {
+        pre = -1;
+      }
+      var post = computePost(reviews[i].review_text, index, 2);
+      if (post == reviews[i].review_text.length) {
+        post -= 1;
+      }
+      reviews[i].review_text = reviews[i].review_text.slice(pre + 1, post + 1);
       var newIndex = reviews[i].review_text.toLowerCase().indexOf(keyword);
       reviews[i].review_text = bold(reviews[i].review_text, newIndex, keyword.length);
+    }
+  } else {
+    // Cut off if too long.
+    for (var i = 0; i < reviews.length; i++) {
+      if (reviews[i].review_text.length > 300) {
+        reviews[i].review_text = '"' + reviews[i].review_text.slice(0, computePost(reviews[i].review_text, 0, 2)) + '..."'
+      }
     }
   }
   for (var i = 0; i < 3; i++) {
