@@ -16,8 +16,9 @@ def _prefetch():
   url = request.args['url']
   subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
-  rest_id = get_restaurant_name().encode('ascii', 'ignore')
+  rest_id = get_restaurant_name()
   print rest_id
+  rest_id = rest_id.decode('UTF-8', 'ignore').encode('ascii', 'ignore')
   return render_template('loading2.html', id=rest_id, url=url)
 
 @app.route('/main', methods=['GET'])
@@ -62,7 +63,7 @@ def _spinner():
 
 @app.route('/loading2')
 def _loading2():
-  return render_template('loading2.html', id=json.dumps(request.args['id']))
+  return render_template('loading2.html', id=request.args['id'])
 
 @app.route('/refine', methods=['GET'])
 def _refine():

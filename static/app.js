@@ -18,6 +18,8 @@ function readMetadata() {
 
 function updateSearchResultArea(data) {
   populateReviewArea(data.stars);
+  populateTopPlates(data.plates);
+  populateSRA(data.reviews)
 }
 
 function refine() {
@@ -52,14 +54,21 @@ function populateReviewArea(stars) {
   });
 }
 
+function populateSRA(reviews) {
+  $('#sra1').html(reviews[0].review_text);
+  $('#sra2').html(reviews[1].review_text);
+  $('#sra3').html(reviews[2].review_text);
+}
+
 function populateTopPlates(plates) {
-  $('#plate1').html(plates[0]['plate']);
-  $('#plate2').html(plates[1]['plate']);
-  $('#plate3').html(plates[2]['plate']);
+  $('#plate1').html(plates[0]);
+  $('#plate2').html(plates[1]);
+  $('#plate3').html(plates[2]);
 }
 
 $(document).ready(function() {
   data = readMetadata();
   populateReviewArea(data.stars);
   populateTopPlates(data.plates);
+  populateSRA(reviews);
 });

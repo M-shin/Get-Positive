@@ -28,13 +28,15 @@
 }
 
 #reviewDistribution {
-
+    position: absolute;
+    top: 40%;
 }
 
 #reviewArea {
     background-color: white;
     position: absolute;
     width: 50%;
+    left: 50%;
     top: 20%;
     height: 20%;
 }
@@ -56,6 +58,38 @@
     text-align: center;
 }
 
+#searchResultsArea {
+    position: absolute;
+    width: 100%;
+    top: 67%;
+    height: 33%;
+    background-color: #00001a;
+}
+
+#sraText {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 10%;
+    color: white;
+    font-size: 25px;
+}
+
+#sraContainer {
+    position: absolute;
+    width: 100%;
+    text-align: left;
+    top: 20%;
+    padding: 10px;
+}
+
+#platex {
+    width: 100%;
+    text-align: center;
+    top: 30%;
+    position: absolute;
+}
+
 #bigTextPlace {
     width: 100%;
     position: absolute;
@@ -69,10 +103,6 @@
     position: absolute;
     color: black;
     top: 33%;
-}
-
-#searchResultsArea {
-    display: none;
 }
 
 #platesArea {
