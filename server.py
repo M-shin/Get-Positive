@@ -4,7 +4,7 @@ from get_positive.get_positive.GetMenu import getMenuItems
 import subprocess
 import json
 
-NUM_REVIEWS = 5
+NUM_REVIEWS = 3
 app = Flask(__name__)
 
 @app.route('/')
@@ -33,9 +33,11 @@ def _appMain():
   # Use model endpoints to access data
   score = get_score(rest_id)
   reviews = get_top_reviews(rest_id, NUM_REVIEWS)
-
-  plates = get_top_plates(rest_id, NUM_REVIEWS)
-  stars = get_review_distribution(rest_id)
+  for review in reviews:
+    review['review_text'] = review['review_text'].encode('ascii', 'ignore')
+  reviews = json.dumps(reviews)
+  plates = json.dumps(get_top_plates(rest_id, NUM_REVIEWS))
+  stars = json.dumps(get_review_distribution(rest_id))
 
   return render_template('app.html', score=score, reviews=reviews, plates=plates, stars=stars, id=rest_id, no_menu=response)
 
