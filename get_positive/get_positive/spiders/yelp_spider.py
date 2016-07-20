@@ -19,9 +19,6 @@ class yelp_spider(CrawlSpider):
 
     self.coll = kwargs.get('coll')
 
-    if self.coll.count({'name': self.restaurant_name}) > 0:
-      return
-
     self.coll.insert_one({
         'name': self.restaurant_name,
         'menuItems': [],
