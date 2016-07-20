@@ -24,10 +24,15 @@ def scrapeReviews(url, restaurant_name):
   client = MongoClient()
   db = client['reviews_db']
   coll = db['reviews']
-  
-  process = CrawlerProcess(get_project_settings())
-  process.crawl(yelp_spider, start_url=url, coll=coll)
+
+  coll.delete_many({})
+
   num = 0
+  process = CrawlerProcess(get_project_settings())
+  process.crawl(yelp_spider, start_url=url,
+                             coll=coll,
+                             page_num=num,
+                             restaurant_name=restaurant_name)
   while num < numReviews:
     process.crawl(yelp_spider, start_url=(url + '?start=' + str(num)),
                                coll=coll,
