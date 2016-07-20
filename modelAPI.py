@@ -5,8 +5,9 @@ import math
 # from urllib2 import unquote
 # from urllib2 import quote
 
-# GLOBAL VARIABLES
-plates = []
+
+# global_model = dict()
+
 
 def get_restaurant_name():
     with open('get_positive/get_positive/reviewCounts.csv', 'rU') as csvfile:
@@ -130,11 +131,40 @@ def get_top_reviews(rest_id, max_count, keyword=None):
     return result
 
 
-def get_plates():
-    plates.append('chicken')
+def get_total_term_count(term, model):
+    initialize_posterior_counts(term, model)
+    return model['P_1_0_counts'][term] + model['P_1_5_counts'][term] + model['P_2_0_counts'][term] + \
+                  model['P_2_5_counts'][term] + model['P_3_0_counts'][term] + model['P_3_5_counts'][term] + \
+                  model['P_4_0_counts'][term] + model['P_4_5_counts'][term] + model['P_5_0_counts'][term]
 
 
-def get_term_score(term, model):
+def get_plates(rest_id):
+    plates = mongo.get_menus_by_name(rest_id)
+    result = []
+    model = get_model(rest_id)
+    for plate in plates:
+        # print "plate: ", plate
+        terms = plate.split()
+        if len(terms) == 1:
+            result.append((plate, get_term_score(plate, model)))
+        else:
+            max_terms = 0
+            max_dish = "No Plates Found"
+            for i in range(0,len(terms)-1):
+                dish = clean_term(terms[i]) + " " + clean_term(terms[i+1])
+                # print "dish: ", dish
+                num_terms = get_total_term_count(dish, model)
+                if num_terms > max_terms:
+                    max_terms = num_terms
+                    max_dish = dish
+            result.append((plate, get_term_score(max_dish, model)))
+
+    # print "plates: ", result
+
+    return result
+
+
+def initialize_posterior_counts(term, model):
     if term not in model['P_1_0_counts']:
         model['P_1_0_counts'][term] = 0
     if term not in model['P_1_5_counts']:
@@ -154,6 +184,16 @@ def get_term_score(term, model):
     if term not in model['P_5_0_counts']:
         model['P_5_0_counts'][term] = 0
 
+
+def get_term_likelihood_score(term, model):
+    initialize_posterior_counts(term, model)
+
+
+def get_term_score(term, model):
+    # if not model:
+    #     global global_model
+    #     model = global_model
+    initialize_posterior_counts(term, model)
     total_count = model['P_1_0_counts'][term] + model['P_1_5_counts'][term] + model['P_2_0_counts'][term] + \
                   model['P_2_5_counts'][term] + model['P_3_0_counts'][term] + model['P_3_5_counts'][term] + \
                   model['P_4_0_counts'][term] + model['P_4_5_counts'][term] + model['P_5_0_counts'][term]
@@ -166,15 +206,23 @@ def get_term_score(term, model):
         return -1
 
 
+def get_plate_score(plate):
+    return plate[1]
+
+
 def get_top_plates(rest_id, max_count, keyword=None):
+    # global global_model
+    # global_model = get_model(rest_id)
     result = []
-    plates.sort(key=get_term_score, reverse=True)
+    plates = get_plates(rest_id)
+    plates.sort(key=get_plate_score, reverse=True)
     count = 0
     while count < max_count and count < len(plates):
         plate = dict()
-        plate['plate'] = plates[count]
-        plate['score'] = get_term_score(plates[count])
+        plate['plate'] = plates[count][0]
+        plate['score'] = get_plate_score(plates[count])
         result.append(plate)
+        count += 1
 
     return result  # [{'plate': 'chicken', 'score': 4.9}]
 
@@ -187,24 +235,14 @@ def get_review_distribution(rest_id, keyword=None):
                 '5': len(model['5_0'])}
 
 
-# Trains a multinomial event model for restaurants' reviews
-def train_general_model():
-    model = {}
-
-
 # Returns total number of reviews for a restaurant
 def get_num_reviews(retrieved_model):
-    # print "retrieved_model['5_0']: ", retrieved_model["5_0"]
     return len(retrieved_model["1_0"]) + len(retrieved_model["1_5"]) + len(retrieved_model["2_0"]) + \
            len(retrieved_model["2_5"]) + len(retrieved_model["3_0"]) + len(retrieved_model["3_5"]) + \
            len(retrieved_model["4_0"]) + len(retrieved_model["4_5"]) + len(retrieved_model["5_0"])
 
 
 def clean_term(term):
-    # print "dirty_term: ", term.encode('utf-8').strip()
-    # # print unicode(term, 'utf8')
-    # print "term: ", term.encode('utf-8').strip().replace(".", "").replace(",", "").replace("\"", "").replace("(", "").replace(")", ""). \
-    #     replace("<br>", "").replace("$", "").lower()
     return term.encode('utf-8').strip().replace(".", "").replace(",", "").replace("\"", "").replace("(", "").replace(")", ""). \
         replace("<br>", "").replace("$", "").replace("!", "").replace(":", "").replace("?", "").lower()
 
@@ -224,19 +262,7 @@ def update_prior_probabilities(retrieved_model):
 
 
 def train_model(retrieved_model):
-    # num_reviews = get_num_reviews(retrieved_model)
-    #
-    # # compute prior probabilities
-    # retrieved_model['P_1_0_prior'] = len(retrieved_model['1_0']) / num_reviews
-    # retrieved_model['P_1_5_prior'] = len(retrieved_model['1_5']) / num_reviews
-    # retrieved_model['P_2_0_prior'] = len(retrieved_model['2_0']) / num_reviews
-    # retrieved_model['P_2_5_prior'] = len(retrieved_model['2_5']) / num_reviews
-    # retrieved_model['P_3_0_prior'] = len(retrieved_model['3_0']) / num_reviews
-    # retrieved_model['P_3_5_prior'] = len(retrieved_model['3_5']) / num_reviews
-    # retrieved_model['P_4_0_prior'] = len(retrieved_model['4_0']) / num_reviews
-    # retrieved_model['P_4_5_prior'] = len(retrieved_model['4_5']) / num_reviews
-    # retrieved_model['P_5_0_prior'] = len(retrieved_model['5_0']) / num_reviews
-
+    # compute prior probabilities
     update_prior_probabilities(retrieved_model)
 
     # compute posterior probabilities
@@ -321,6 +347,7 @@ def train_model(retrieved_model):
 def get_model(restaurant):
     # retrieve model from DB
     data = mongo.search_by_restaurant(restaurant)
+    # print "data: ", data
     retrieved_model = dict()
 
     # if a model doesn't exist, it trains one
@@ -369,13 +396,16 @@ def get_model(restaurant):
 
 
 # def main():
-#     # model = get_model("Fang")
-#     # print "Model: ", model
-#     # print "Score: ", get_score("Fang", "fish")
-#     # print "review_distribution: ", get_review_distribution("fang")
-#     # print "General Score: ", get_score("Fang")
+#     model = get_model("Fang")
+#     print "Model: ", model
+#     print "Score: ", get_score("Fang", "fish")
+#     print "review_distribution: ", get_review_distribution("fang")
+#     print "General Score: ", get_score("Fang")
 #     print "get_top_reviews: ", get_top_reviews("Fang", 3)
 #     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "fish")
+#     get_plates("Fang")
+#     top_plates = get_top_plates("Fang", 3)
+#     print "top_plates: ", top_plates
 #
 # if __name__ == "__main__":
 #     main()
