@@ -16,7 +16,8 @@ def _prefetch():
   url = request.args['url']
   subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
-  rest_id = get_restaurant_name()
+  rest_id = get_restaurant_name().encode('ascii', 'ignore')
+  print rest_id
   return render_template('loading2.html', id=rest_id, url=url)
 
 @app.route('/main', methods=['GET'])
