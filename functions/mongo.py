@@ -84,7 +84,7 @@ def save_restaurant_model(name, model):
 def get_restaurant_model(name):
   client = MongoClient('mongodb://172.20.9.140:27017')
   coll = client.reviews_db.reviews
-  cursor = coll.find({'name': re.compile(name, re.IGNORECASE)})
-  if 'model' in cursor[0]:
+  cursor = list(coll.find({'name': re.compile(name, re.IGNORECASE)}))
+  if len(cursor) > 0 and 'model' in cursor[0]:
     return cursor[0]['model']
   return None

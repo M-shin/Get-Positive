@@ -1,4 +1,5 @@
 from __future__ import division
+import csv
 from functions import mongo
 import math
 # from urllib2 import unquote
@@ -7,6 +8,11 @@ import math
 # GLOBAL VARIABLES
 plates = []
 
+def get_restaurant_name():
+    with open('get_positive/get_positive/reviewCounts.csv', 'rU') as csvfile:
+        reader = csv.reader(csvfile, delimiter = ',')
+        for row in reader:
+            return row[1]
 
 # Returns a quality score for a given term (-1 if term doesn't exist)
 def get_score(rest_id, keyword=None):
