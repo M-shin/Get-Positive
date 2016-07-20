@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 from modelAPI import *
 import subprocess
+import time
 
 NUM_REVIEWS = 5
 app = Flask(__name__)
@@ -19,6 +20,7 @@ def _prefetch():
 
 @app.route('/main', methods=['GET'])
 def _appMain():
+  time.sleep(10000)
   url = request.args['url']
   rest_id = request.args['id']
 
