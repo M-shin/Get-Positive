@@ -17,7 +17,6 @@ def _prefetch():
   subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
   rest_id = get_restaurant_name()
-  print rest_id
   rest_id = rest_id.decode('UTF-8', 'ignore').encode('ascii', 'ignore')
   return render_template('loading2.html', id=rest_id, url=url)
 
@@ -61,7 +60,8 @@ def _testMain():
       'review_text': 'Like, real good'
     },
   ];
-  plates = ['Fish Soup', 'Fish Bowl', 'Fishy'];
+  #  plates = ['Fish Soup', 'Fish Bowl', 'Fishy'];
+  plates = []
   stars = {'1': 5, '2': 2, '3': 10, '4': 16, '5': 40}
 
   return render_template('app.html', score=score, reviews=json.dumps(reviews), plates=json.dumps(plates), stars=json.dumps(stars), id='In-N-Out Burger')
