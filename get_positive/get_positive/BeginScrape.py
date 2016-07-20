@@ -21,7 +21,7 @@ args = parser.parse_args()
 def scrapeReviews(url, restaurant_name):
   # Read in number of reviews
   numReviews = 0
-  with open('reviewCounts.csv', 'rU') as csvfile:
+  with open('get_positive/get_positive/reviewCounts.csv', 'rU') as csvfile:
     reader = csv.reader(csvfile, delimiter = ',')
     for row in reader:
       numReviews = int(row[0])
