@@ -1,2 +1,30 @@
-<meta
-<div>{{ id }} </div>
+<!doctype html>
+<html>
+  <head>
+    <meta id="id" name="id" content="{{ id }}">
+    <meta id="url" name="url" content="{{ url }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='landing.css') }}">
+  </head>
+  <body id="body">
+
+    <div id="topRow">
+      <div id="topRowText">
+        Fetching Reviews for...
+      </div>
+    </div>
+    <div id="middleRow">
+      <div id="imageOverlay">
+        <div id="middleRowText">
+          {{ id }}
+        </div>
+      </div>
+    </div>
+    <div id="bottomRow">
+      <div id="bottomRowText">
+        (You have great taste!)
+      </div>
+    </div>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='loading2.js') }}"></script>
+</html>
