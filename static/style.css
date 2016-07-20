@@ -30,7 +30,7 @@
 #reviewArea {
     background-color: white;
     position: absolute;
-    width: 100%;
+    width: 50%;
     top: 20%;
     height: 20%;
 }
@@ -66,8 +66,8 @@
 #platesArea {
     background-color: white;
     position: absolute;
-    width: 100%;
-    top: 70%;
+    width: 50%;
+    top: 20%;
     height: 30%;
 }
 

@@ -33,7 +33,10 @@ class review_count_spider(CrawlSpider):
   def parse_count(self, count, pretty_name, zip_code):
 
     writer = open('get_positive/get_positive/reviewCounts.csv', 'wb')
-    writer.write(str(count) + ',' + pretty_name + ',' + zip_code)
+    try:
+      writer.write(str(count) + ',' + str(pretty_name) + ',' + str(zip_code))
+    except UnicodeDecodeError:
+      pass
     writer.close()
 
     item = ReviewCountItem(
