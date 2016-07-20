@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <meta id="id" name="id" content="{{ id }}">
     <meta id="score" name="score" content="{{ score }}">
     <meta id="reviews" name="reviews" content="{{ reviews }}">
     <meta id="plates" name="plates" content="{{ plates }}">
@@ -9,25 +10,38 @@
     <title>Get Positive</title>
   </head>
   <body id="body">
-    <div id="header">
-      <div id="headerText">
-        {{ id }}
+    <div id="headerArea">
+      <div id="headerOverlay">
+        <div id="headerText">
+          {{ id }}
+        </div>
       </div>
     </div>
     <div id="reviewArea">
+      <div id="reviewDistribution">
+        <canvas id="myChart"></canvas>
+      </div>
     </div>
     <div id="searchArea">
       <div id="bigTextPlace">STILL HUNGRY?</div>
       <div id="smallTextPlace">Refine your search below</div>
+      <div id="formArea">
       <input id="inputField" placeholder="Ex. Chicken..." name="keyword">
+      <button id="inputButton" onclick="refine()">GET POSITIVE</button>
+      </div>
+      </div>
+    <div id="searchResultsArea">
     </div>
     <div id="platesArea">
       <div id="platesText">
         TOP PLATES
       </div>
+      <div id="plate1"></div>
+      <div id="plate2"></div>
+      <div id="plate3"></div>
     </div>
   </body>
-
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </html>

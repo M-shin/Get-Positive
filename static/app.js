@@ -1,11 +1,15 @@
 // Main js file for app.html
 
-function readMetadata() {
-
-  function replaceQuotes(data) {
+function replaceQuotes(data) {
     return data.split("'").join('"');
-  }
+}
 
+function getId() {
+  var id = $('#id').attr('content');
+  return id;
+}
+
+function readMetadata() {
   var score = JSON.parse(replaceQuotes($('#score').attr('content')));
   var reviews = JSON.parse(replaceQuotes($('#reviews').attr('content')));
   var plates = JSON.parse(replaceQuotes($('#plates').attr('content')));
@@ -14,10 +18,36 @@ function readMetadata() {
   return {score: score, reviews: reviews, plates: plates, stars: stars};
 }
 
+function updateSearchResultArea(data) {
+  console.log(data);
+}
+
+function refine() {
+  var keyword = $('#inputField').val();
+  console.log('Requesting...')
+  $.get('/refine?keyword=' + keyword + '&id=' + getId(), function(data) {
+    console.log('Done!')
+    updateSearchResultArea(data);
+  });
+}
+
+function populateReviewArea(stars) {
+  console.log(stars);
+  var total = 0;
+  total += stars.1;
+  total += stars.2;
+  total += stars.3;
+  total += stars.4;
+  total += stars.5;
+  var ctx = $('#myChart');
+}
+
+function populateTopPlates(plates) {
+  console.log(plates);
+}
+
 $(document).ready(function() {
   data = readMetadata();
-  $('#displayScore').html(JSON.stringify(data.score));
-  $('#displayReviews').html(JSON.stringify(data.reviews));
-  $('#displayPlates').html(JSON.stringify(data.plates));
-  $('#displayStars').html(JSON.stringify(data.stars));
+  populateReviewArea(data.stars);
+  populateTopPlates(data.plates);
 });
