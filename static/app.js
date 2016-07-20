@@ -22,7 +22,11 @@ function readMetadata() {
 }
 
 function updateKSA(score) {
-  $('#ksa').html('<b>' + $('#inputField').val() + '</b> has a score of: <b>' + (0.0 + score).toFixed(2) + '</b>');
+  if (score >= 0) {
+    $('#ksa').html('<b>' + $('#inputField').val() + '</b> has a score of: <b>' + (0.0 + score).toFixed(2) + '</b>');
+  } else {
+    $('#ksa').html('Sorry, <b>' + $('#inputField').val() + '</b> doesn\'t have a score');
+  }
 }
 
 function updateSearchResultArea(data) {
