@@ -2,6 +2,8 @@ from __future__ import division
 import csv
 from functions import mongo
 import math
+from multiprocessing.pool import Pool
+import time
 # from urllib2 import unquote
 # from urllib2 import quote
 
@@ -103,27 +105,30 @@ def score_term_reviews(term, model):
 
     return result
 
+def run_computation(args):
+    items = []
+    for review in args['model'][args['string_score']]:
+        items.append((args['score'], compute_likelihood(args['string_score'], review, args['model']), review))
+    return items
 
 def score_reviews(model):
     reviews = []
-    for review in model['1_0']:
-        reviews.append((1.0, compute_likelihood('1_0', review, model), review))
-    for review in model['1_5']:
-        reviews.append((1.5, compute_likelihood('1_5', review, model), review))
-    for review in model['2_0']:
-        reviews.append((2.0, compute_likelihood('2_0', review, model), review))
-    for review in model['2_5']:
-        reviews.append((2.5, compute_likelihood('2_5', review, model), review))
-    for review in model['3_0']:
-        reviews.append((3.0, compute_likelihood('3_0', review, model), review))
-    for review in model['3_5']:
-        reviews.append((3.5, compute_likelihood('3_5', review, model), review))
-    for review in model['4_0']:
-        reviews.append((4.0, compute_likelihood('4_0', review, model), review))
-    for review in model['4_5']:
-        reviews.append((4.5, compute_likelihood('4_5', review, model), review))
-    for review in model['5_0']:
-        reviews.append((5.0, compute_likelihood('5_0', review, model), review))
+
+    processes = []
+    num = 1.0
+    while num <= 5.0:
+        processes.append({
+            'string_score': str(num).replace('.', '_'),
+            'score': num,
+            'model': model
+        })
+        num += 0.5
+
+    pool = Pool(8)
+    for result in pool.imap(run_computation, processes):
+        reviews.extend(result)
+    pool.close()
+    pool.join()
 
     # sort reviews from best to worst
     reviews.sort(key=get_second, reverse=True)
