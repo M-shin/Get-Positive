@@ -17,7 +17,7 @@ function readMetadata() {
 }
 
 function updateSearchResultArea(data) {
-  console.log(data);
+  populateReviewArea(data.stars);
 }
 
 function refine() {

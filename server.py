@@ -67,10 +67,11 @@ def _loading2():
 def _refine():
   rest_id = request.args['id']
   keyword = request.args['keyword']
+
   data = {
     'score': get_score(rest_id, keyword),
-    'reviews': get_reviews(rest_id, 3, keyword),
-    'plates': get_plates(rest_id, 3, keyword),
+    'reviews': get_top_reviews(rest_id, 3, keyword),
+    'plates': get_top_plates(rest_id, 3, keyword),
     'stars': get_review_distribution(rest_id, keyword)
   }
   return jsonify(**data)
