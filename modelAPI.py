@@ -74,15 +74,25 @@ def compute_bigram_likelihood(num_stars, review, model):
 
 def score_term_reviews(term, model):
     result = []
-    initial_score = get_term_score(term, model)
+    terms = term.split()
+    if (len(terms)) == 1:
+        initial_score = get_term_score(term, model)
+        is_unigram = 'true'
+    else:
+        initial_score = get_bigram_term_score(term, model)
+        is_unigram = 'false'
     term_score = round(initial_score)
     if term_score == 0.0:
         term_score = 1.0
     reviews = mongo.search_by_keyword(term)
     for review in reviews:
         if review['rating'] == term_score:
-            result.append((review['rating'],compute_likelihood(str(review['rating']).replace(".", "_"), \
-                   review['body'], model), review['body']))
+            if is_unigram == 'true':
+                result.append((review['rating'],compute_likelihood(str(review['rating']).replace(".", "_"), \
+                       review['body'], model), review['body']))
+            else:
+                result.append((review['rating'], compute_bigram_likelihood(str(review['rating']).replace(".", "_"), \
+                                                                    review['body'], model), review['body']))
 
     if term_score - initial_score >= 0:
         result.sort(key=get_second)
@@ -649,19 +659,19 @@ def get_model(restaurant):
         return mongo.get_restaurant_model(restaurant)
 
 
-def main():
-    model = get_model("Fang")
-    print "Model: ", model
-    print "Score: ", get_term_score_2("service", model)
-    print "likelihood score: ", get_term_likelihood_score("service", model)
-    print "review_distribution: ", get_review_distribution("fang")
-    print "General Score: ", get_score("Fang")
-    print "get_top_reviews: ", get_top_reviews("Fang", 3)
-    print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "service")
-    get_plates("Fang")
-    top_plates = get_top_plates("Fang", 3)
-    print "top_plates: ", top_plates
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     model = get_model("Fang")
+#     print "Model: ", model
+#     print "Score: ", get_term_score_2("service", model)
+#     print "likelihood score: ", get_term_likelihood_score("service", model)
+#     print "review_distribution: ", get_review_distribution("fang")
+#     print "General Score: ", get_score("Fang")
+#     print "get_top_reviews: ", get_top_reviews("Fang", 3)
+#     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "service")
+#     get_plates("Fang")
+#     top_plates = get_top_plates("Fang", 3)
+#     print "top_plates: ", top_plates
+#
+#
+# if __name__ == "__main__":
+#     main()
