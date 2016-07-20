@@ -21,5 +21,6 @@ def getReviewCount(url):
   # Get the number of reviews
   process = CrawlerProcess(get_project_settings())
   process.crawl(review_count_spider, start_url=url)
+  process.start()
 
 getReviewCount(args.u)
