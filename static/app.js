@@ -53,6 +53,9 @@ function populateReviewArea(stars) {
 }
 
 function populateTopPlates(plates) {
+  $('#plate1').html(plates[0]['plate']);
+  $('#plate2').html(plates[1]['plate']);
+  $('#plate3').html(plates[2]['plate']);
 }
 
 $(document).ready(function() {
