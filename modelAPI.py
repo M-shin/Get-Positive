@@ -142,22 +142,28 @@ def get_plates(rest_id):
     plates = mongo.get_menus_by_name(rest_id)
     result = []
     model = get_model(rest_id)
+    wine_set = get_wine_set()
     for plate in plates:
-        # print "plate: ", plate
+        is_wine = 'false'
+        plate = plate.lower()
+        # if plate not in wine_set:
         terms = plate.split()
         if len(terms) == 1:
-            result.append((plate, get_term_score(plate, model)))
+            if plate not in wine_set:
+                result.append((plate, get_term_score(plate, model)))
         else:
             max_terms = 0
             max_dish = "No Plates Found"
-            for i in range(0,len(terms)-1):
-                dish = clean_term(terms[i]) + " " + clean_term(terms[i+1])
-                # print "dish: ", dish
+            for i in range(0,len(terms)):
+                dish = clean_term(terms[i])  #+ " " + clean_term(terms[i+1])
+                if dish not in wine_set:
+                    is_wine = 'true'
                 num_terms = get_total_term_count(dish, model)
                 if num_terms > max_terms:
                     max_terms = num_terms
                     max_dish = dish
-            result.append((plate, get_term_score(max_dish, model)))
+            if is_wine == 'false':
+                result.append((plate, get_term_score(max_dish, model)))
 
     # print "plates: ", result
 
@@ -187,12 +193,40 @@ def initialize_posterior_counts(term, model):
 
 def get_term_likelihood_score(term, model):
     initialize_posterior_counts(term, model)
+    total_term_count = get_total_term_count(term, model)
+    s1 = (model['P_1_0_counts'][term] / model['P_1_0_counts']['total_count'])
+    s2 = (model['P_2_0_counts'][term] / model['P_2_0_counts']['total_count'])
+    s3 = (model['P_3_0_counts'][term] / model['P_3_0_counts']['total_count'])
+    s4 = (model['P_4_0_counts'][term] / model['P_4_0_counts']['total_count'])
+    s5 = (model['P_5_0_counts'][term] / model['P_5_0_counts']['total_count'])
+    sum = s1+s2+s3+s4+s5
+
+    if sum != 0:
+        # print "score: ", (s1/sum) + (s2/sum)*2 + (s3/sum)*3 + (s4/sum)*4 + (s5/sum)*5
+        result = (s1/sum) + (s2/sum)*2 + (s3/sum)*3 + (s4/sum)*4 + (s5/sum)*5
+        return result
+    else:
+        return -1
 
 
 def get_term_score(term, model):
-    # if not model:
-    #     global global_model
-    #     model = global_model
+
+    # initialize_posterior_counts(term, model)
+    # total_count = model['P_1_0_counts'][term] + model['P_1_5_counts'][term] + model['P_2_0_counts'][term] + \
+    #               model['P_2_5_counts'][term] + model['P_3_0_counts'][term] + model['P_3_5_counts'][term] + \
+    #               model['P_4_0_counts'][term] + model['P_4_5_counts'][term] + model['P_5_0_counts'][term]
+    # score_sum = model['P_1_0_counts'][term] + 1.5 * model['P_1_5_counts'][term] + 2 * model['P_2_0_counts'][term] + 2.5 * \
+    #             model['P_2_5_counts'][term] + 3 * model['P_3_0_counts'][term] + 3.5 * model['P_3_5_counts'][term] + 4 * \
+    #             model['P_4_0_counts'][term] + 4.5 * model['P_4_5_counts'][term] + 5 * model['P_5_0_counts'][term]
+    # if total_count != 0:
+    #     print "reg_score: ", score_sum / total_count
+    # else:
+    #     print "reg_score: ", -1
+
+    return get_term_likelihood_score(term, model)
+    # return get_term_score_2(term, model)
+
+def get_term_score_2(term, model):
     initialize_posterior_counts(term, model)
     total_count = model['P_1_0_counts'][term] + model['P_1_5_counts'][term] + model['P_2_0_counts'][term] + \
                   model['P_2_5_counts'][term] + model['P_3_0_counts'][term] + model['P_3_5_counts'][term] + \
@@ -211,8 +245,6 @@ def get_plate_score(plate):
 
 
 def get_top_plates(rest_id, max_count, keyword=None):
-    # global global_model
-    # global_model = get_model(rest_id)
     result = []
     plates = get_plates(rest_id)
     plates.sort(key=get_plate_score, reverse=True)
@@ -261,7 +293,17 @@ def update_prior_probabilities(retrieved_model):
     retrieved_model['P_5_0_prior'] = len(retrieved_model['5_0']) / num_reviews
 
 
+def get_wine_set():
+    wine_set = set()
+    with open("wine.txt", "r") as ins:
+        for line in ins:
+            wine_set.add(line)
+    return wine_set
+
+
 def train_model(retrieved_model):
+    # initialize_bigrams(retrieved_model)
+
     # compute prior probabilities
     update_prior_probabilities(retrieved_model)
 
@@ -398,11 +440,12 @@ def get_model(restaurant):
 # def main():
 #     model = get_model("Fang")
 #     print "Model: ", model
-#     print "Score: ", get_score("Fang", "fish")
+#     print "Score: ", get_term_score_2("service", model)
+#     print "likelihood score: ", get_term_likelihood_score("service", model)
 #     print "review_distribution: ", get_review_distribution("fang")
 #     print "General Score: ", get_score("Fang")
 #     print "get_top_reviews: ", get_top_reviews("Fang", 3)
-#     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "fish")
+#     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "service")
 #     get_plates("Fang")
 #     top_plates = get_top_plates("Fang", 3)
 #     print "top_plates: ", top_plates
