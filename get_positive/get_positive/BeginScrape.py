@@ -31,6 +31,9 @@ def scrapeReviews(url, restaurant_name):
   db = client['reviews_db']
   coll = db['reviews']
 
+  if coll.count({'name': restaurant_name}) > 0:
+    return
+
   num = 0
   process = CrawlerProcess(get_project_settings())
   process.crawl(yelp_spider, start_url=url,
