@@ -86,6 +86,12 @@ function renderTopPlateWarning() {
   $('#plate1').html('Sorry, but we can only suggest Top Plates for the customers of <a href="http://locu.com">Locu</a>');
 }
 
+$(document).keypress(function(e) {
+  if (e.which == 13) {
+    refine();
+  }
+});
+
 $(document).ready(function() {
   data = readMetadata();
   console.log(JSON.stringify(data));

@@ -1,3 +1,8 @@
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 a {
     color: cyan;
 }
@@ -5,8 +10,8 @@ a {
 #body {
     background-image: url("img/img1.jpeg");
     background-size: cover;
+    background-repeat: no-repeat;
     width: 100%;
-    height: 100%;
     margin: 0px;
 }
 
@@ -50,7 +55,7 @@ a {
     background: rgba(0, 0, 31, 0.8);
     width: 100%;
     top: 20%;
-    height: 30%;
+    height: 22%;
 }
 
 #reviewArea {
@@ -68,23 +73,24 @@ a {
     text-align: center;
     font-size: 25px;
     top: 5%;
+    right: 0%
 }
 
 #searchArea {
     position: absolute;
     width: 100%;
     top: 42%;
-    height: 25%;
-    background-color: rgba(208, 0, 0, 0.7);
+    height: 24%;
+    background-color: rgba(208, 0, 0, 0.6);
     text-align: center;
 }
 
 #searchResultsArea {
     position: absolute;
     width: 100%;
-    top: 67%;
-    height: 33%;
-    background-color: #00001a;
+    top: 64%;
+    height: 36%;
+    background-color: rgba(0, 0, 26, 1.0);
 }
 
 #sraText {
