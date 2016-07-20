@@ -1,23 +1,16 @@
 // Main js file for app.html
 
-function replaceQuotes(data) {
-  return data.split("'").join('"');//.split('u"').join('"');
-}
-
 function getId() {
   var id = $('#id').attr('content');
   return id;
 }
 
 function readMetadata() {
-  console.log($('#score').attr('content'));
-  console.log(replaceQuotes($('#score').attr('content')));
-  console.log($('#reviews').attr('content'));
-  console.log(replaceQuotes($('#reviews').attr('content')));
-  var score = JSON.parse(replaceQuotes($('#score').attr('content')));
-  var reviews = JSON.parse(replaceQuotes($('#reviews').attr('content')));
-  var plates = JSON.parse(replaceQuotes($('#plates').attr('content')));
-  var stars = JSON.parse(replaceQuotes($('#stars').attr('content')));
+  var score = JSON.parse($('#score').attr('content'));
+  var reviewString = $('#reviews').attr('content'));
+  var reviews = JSON.parse(reviewString);
+  var plates = JSON.parse($('#plates').attr('content'));
+  var stars = JSON.parse($('#stars').attr('content'));
 
   return {score: score, reviews: reviews, plates: plates, stars: stars};
 }
@@ -36,7 +29,6 @@ function refine() {
 }
 
 function populateReviewArea(stars) {
-  console.log(stars);
   var total = 0;
   total += stars['1'];
   total += stars['2'];
