@@ -1,7 +1,8 @@
+from __future__ import division
 from functions import mongo
 import math
-from urllib2 import unquote
-from urllib2 import quote
+# from urllib2 import unquote
+# from urllib2 import quote
 
 # GLOBAL VARIABLES
 plates = []
@@ -9,14 +10,30 @@ plates = []
 
 # Returns a quality score for a given term (-1 if term doesn't exist)
 def get_score(rest_id, keyword=None):
+    model = get_model(rest_id)
     if keyword:
-        model = get_model(rest_id)
         return get_term_score(keyword, model)
+    else:
+        get_general_score(model)
+
+
+def get_general_score(model):
+    total_count = get_num_reviews(model)
+    score_sum = len(model['1_0']) + 1.5*len(model['1_5']) + 2*len(model['2_0']) + 2.5*len(model['2_5']) + \
+                3*len(model['3_0']) + 3.5*len(model['3_5']) + 4*len(model['4_0']) + 4.5*len(model['4_5']) + \
+                5*len(model['5_0'])
+    if total_count != 0:
+        return score_sum / total_count
+    else:
+        return -1
 
 
 def compute_likelihood(num_stars, review, model):
     # compute prior log probability
+    update_prior_probabilities(model)
     prior_string = "P_" + num_stars + "_prior"
+    print "prior: ", model[prior_string]
+    print "prior_real: ", len(model['1_0']) / get_num_reviews(model)
     prob = math.log(model[prior_string])
 
     # add the posterior log probabilities of the review's terms naively
@@ -83,23 +100,23 @@ def get_plates():
 
 def get_term_score(term, model):
     if term not in model['P_1_counts']:
-        model['P_1_counts'][term] = 0
+        model['P_1_0_counts'][term] = 0
     if term not in model['P_1_5_counts']:
         model['P_1_5_counts'][term] = 0
     if term not in model['P_2_counts']:
-        model['P_2_counts'][term] = 0
+        model['P_2_0_counts'][term] = 0
     if term not in model['P_2_5_counts']:
         model['P_2_5_counts'][term] = 0
     if term not in model['P_3_counts']:
-        model['P_3_counts'][term] = 0
+        model['P_3_0_counts'][term] = 0
     if term not in model['P_3_5_counts']:
         model['P_3_5_counts'][term] = 0
     if term not in model['P_4_counts']:
-        model['P_4_counts'][term] = 0
+        model['P_4_0_counts'][term] = 0
     if term not in model['P_4_5_counts']:
         model['P_4_5_counts'][term] = 0
     if term not in model['P_5_counts']:
-        model['P_5_counts'][term] = 0
+        model['P_5_0_counts'][term] = 0
 
     total_count = model['P_1_counts'][term] + model['P_1_5_counts'][term] + model['P_2_counts'][term] + \
                   model['P_2_5_counts'][term] + model['P_3_counts'][term] + model['P_3_5_counts'][term] + \
@@ -129,7 +146,8 @@ def get_top_plates(rest_id, max_count, keyword=None):
 def get_review_distribution(rest_id, keyword=None):
     model = get_model(rest_id)
     if not keyword:
-        return {'1': len(model['1_0']), '2': len(model['2_0']), '3': len(model['3_0']), '4': len(model['4_0']),
+        return {'1': len(model['1_0']), '1.5': len(model['1_5']), '2': len(model['2_0']), '2.5': len(model['2_5']), \
+                '3': len(model['3_0']), '3.5': len(model['3_5']), '4': len(model['4_0']), '4.5': len(model['4_5']), \
                 '5': len(model['5_0'])}
 
 
@@ -140,6 +158,7 @@ def train_general_model():
 
 # Returns total number of reviews for a restaurant
 def get_num_reviews(retrieved_model):
+    # print "retrieved_model['5_0']: ", retrieved_model["5_0"]
     return len(retrieved_model["1_0"]) + len(retrieved_model["1_5"]) + len(retrieved_model["2_0"]) + \
            len(retrieved_model["2_5"]) + len(retrieved_model["3_0"]) + len(retrieved_model["3_5"]) + \
            len(retrieved_model["4_0"]) + len(retrieved_model["4_5"]) + len(retrieved_model["5_0"])
@@ -154,10 +173,8 @@ def clean_term(term):
         replace("<br>", "").replace("$", "").lower()
 
 
-def train_model(retrieved_model):
+def update_prior_probabilities(retrieved_model):
     num_reviews = get_num_reviews(retrieved_model)
-
-    # compute prior probabilities
     retrieved_model['P_1_0_prior'] = len(retrieved_model['1_0']) / num_reviews
     retrieved_model['P_1_5_prior'] = len(retrieved_model['1_5']) / num_reviews
     retrieved_model['P_2_0_prior'] = len(retrieved_model['2_0']) / num_reviews
@@ -167,6 +184,23 @@ def train_model(retrieved_model):
     retrieved_model['P_4_0_prior'] = len(retrieved_model['4_0']) / num_reviews
     retrieved_model['P_4_5_prior'] = len(retrieved_model['4_5']) / num_reviews
     retrieved_model['P_5_0_prior'] = len(retrieved_model['5_0']) / num_reviews
+
+
+def train_model(retrieved_model):
+    # num_reviews = get_num_reviews(retrieved_model)
+    #
+    # # compute prior probabilities
+    # retrieved_model['P_1_0_prior'] = len(retrieved_model['1_0']) / num_reviews
+    # retrieved_model['P_1_5_prior'] = len(retrieved_model['1_5']) / num_reviews
+    # retrieved_model['P_2_0_prior'] = len(retrieved_model['2_0']) / num_reviews
+    # retrieved_model['P_2_5_prior'] = len(retrieved_model['2_5']) / num_reviews
+    # retrieved_model['P_3_0_prior'] = len(retrieved_model['3_0']) / num_reviews
+    # retrieved_model['P_3_5_prior'] = len(retrieved_model['3_5']) / num_reviews
+    # retrieved_model['P_4_0_prior'] = len(retrieved_model['4_0']) / num_reviews
+    # retrieved_model['P_4_5_prior'] = len(retrieved_model['4_5']) / num_reviews
+    # retrieved_model['P_5_0_prior'] = len(retrieved_model['5_0']) / num_reviews
+
+    update_prior_probabilities(retrieved_model)
 
     # compute posterior probabilities
     terms = set() # set of unique terms
@@ -298,10 +332,11 @@ def get_model(restaurant):
 
 
 def main():
-    model = get_model("Fang")
-    print "Model: ", model
-    print "Score: ", get_score("Fang", "fish")
-    print "review_distribution: ", get_review_distribution("fang")
+    # model = get_model("Fang")
+    # print "Model: ", model
+    # print "Score: ", get_score("Fang", "fish")
+    # print "review_distribution: ", get_review_distribution("fang")
+    print "General Score: ", get_score("Fang")
     print "get_top_reviews: ", get_top_reviews("Fang", 3)
 
 if __name__ == "__main__":
