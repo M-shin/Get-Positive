@@ -1,0 +1,41 @@
+#body {
+    background-color: red;
+    color: white;
+    text-align: center;
+}
+
+#titleArea {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+}
+
+#mainTitle {
+    font-size: 200%;
+    padding-bottom: 5px;
+}
+
+#subTitle {
+    font-size: 150%;
+    padding-bottom: 20px;
+}
+
+#formArea {
+    position: absolute;
+    width: 100%;
+    top: 55%;
+}
+
+#inputField {
+    width: 60%;
+    height: 18px;
+    border: none;
+}
+
+#inputButton {
+    background-color: black;
+    border: none;
+    color: white;
+    width: 20%;
+    height: 20px;
+}

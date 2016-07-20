@@ -2,15 +2,20 @@
 <html>
   <head>
     <title>Get Positive</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='landing.css') }}">
   </head>
-  <body>
+  <body id="body">
     <div id="loadingArea">
-      <div> Hi this is our landing page </div>
-      <form action="/main" onsubmit="handleSubmit()">
-        <input type="text" name="url" placeholder="yelp.com/...">
-        <input type="submit" value="Submit">
-      </form>
+      <div id="titleArea">
+        <div id="mainTitle"> Pick a Restaurant...Any Restaurant </div>
+        <div id="subTitle"> (Paste the Yelp URL below) </div>
+      </div>
+      <div id="formArea">
+        <input id="inputField" type="text" name="url" placeholder="yelp.com/...">
+        <button id="inputButton" onclick="handleSubmit()">
+          GET POSITIVE
+        </button>
+      </div>
     </div>
   </body>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
