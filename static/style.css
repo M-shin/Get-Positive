@@ -31,14 +31,14 @@
     background-color: white;
     position: absolute;
     width: 100%;
-    top: 30%;
-    height: 10%;
+    top: 20%;
+    height: 20%;
 }
 
 #searchArea {
     position: absolute;
     width: 100%;
-    top: 40%;
+    top: 47%;
     height: 20%;
     background-color: red;
     text-align: center;
@@ -67,8 +67,8 @@
     background-color: white;
     position: absolute;
     width: 100%;
-    top: 60%;
-    height: 40%;
+    top: 70%;
+    height: 30%;
 }
 
 #platesText {
