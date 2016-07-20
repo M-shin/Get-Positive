@@ -288,11 +288,26 @@ def get_term_likelihood_score(term, model):
 def get_bigram_term_likelihood_score(term, model):
     initialize_bigram_posterior_counts(term, model)
     total_term_count = get_total_bigram_term_count(term, model)
-    s1 = (model['bigram']['P_1_0_counts'][term] / model['bigram']['P_1_0_counts']['total_count'])
-    s2 = (model['bigram']['P_2_0_counts'][term] / model['bigram']['P_2_0_counts']['total_count'])
-    s3 = (model['bigram']['P_3_0_counts'][term] / model['bigram']['P_3_0_counts']['total_count'])
-    s4 = (model['bigram']['P_4_0_counts'][term] / model['bigram']['P_4_0_counts']['total_count'])
-    s5 = (model['bigram']['P_5_0_counts'][term] / model['bigram']['P_5_0_counts']['total_count'])
+
+    s1 = 0
+    if (model['bigram']['P_1_0_counts']['total_count']):
+        s1 = (model['bigram']['P_1_0_counts'][term] / model['bigram']['P_1_0_counts']['total_count'])
+
+    s2 = 0
+    if (model['bigram']['P_2_0_counts']['total_count']):
+        s2 = (model['bigram']['P_2_0_counts'][term] / model['bigram']['P_2_0_counts']['total_count'])
+
+    s3 = 0
+    if (model['bigram']['P_3_0_counts']['total_count']):
+        s3 = (model['bigram']['P_3_0_counts'][term] / model['bigram']['P_3_0_counts']['total_count'])
+
+    s4 = 0
+    if (model['bigram']['P_4_0_counts']['total_count']):
+        s4 = (model['bigram']['P_4_0_counts'][term] / model['bigram']['P_4_0_counts']['total_count'])
+
+    s5 = 0
+    if (model['bigram']['P_5_0_counts']['total_count']):
+        s5 = (model['bigram']['P_5_0_counts'][term] / model['bigram']['P_5_0_counts']['total_count'])
     sum = s1+s2+s3+s4+s5
 
     if sum != 0:
