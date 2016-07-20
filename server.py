@@ -16,8 +16,9 @@ def _prefetch():
   url = request.args['url']
   subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
-  rest_id = get_restaurant_name().encode('ascii', 'ignore')
+  rest_id = get_restaurant_name()
   print rest_id
+  rest_id = rest_id.decode('UTF-8', 'ignore').encode('ascii', 'ignore')
   return render_template('loading2.html', id=rest_id, url=url)
 
 @app.route('/main', methods=['GET'])
@@ -46,7 +47,20 @@ def _appMain():
 def _testMain():
   # Use model endpoints to access data
   score = 5.0
-  reviews = ['Wow you guys are good', 'Like, real good', 'JK you suck hahahaha'];
+  reviews = [
+    {
+      'num_stars': 5,
+      'review_text': 'Wow you guys are good'
+    },
+    {
+      'num_stars': 4,
+      'review_text': 'Like, real good'
+    },
+    {
+      'num_stars': 4,
+      'review_text': 'Like, real good'
+    },
+  ];
   plates = ['Fish Soup', 'Fish Bowl', 'Fishy'];
   stars = {'1': 5, '2': 2, '3': 10, '4': 16, '5': 40}
 
