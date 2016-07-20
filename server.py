@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from modelAPI import *
 from get_positive.get_positive.GetMenu import getMenuItems
 import subprocess
+import json
 
 NUM_REVIEWS = 5
 app = Flask(__name__)
@@ -23,23 +24,20 @@ def _appMain():
   url = request.args['url']
   rest_id = request.args['id']
 
-  # Perhaps a step here where we check if the data is already in Mongo
-
   # Begin by scraping the reviews
   subprocess.call(['python', 'get_positive/get_positive/BeginScrape.py', '-u', url, '-n', rest_id])
 
   # Populate database with menu items
   response = getMenuItems()
-  if response == 1:
-    print 'ERRORRRRRRRRRRRR'
 
   # Use model endpoints to access data
   score = get_score(rest_id)
   reviews = get_top_reviews(rest_id, NUM_REVIEWS)
+
   plates = get_top_plates(rest_id, NUM_REVIEWS)
   stars = get_review_distribution(rest_id)
 
-  return render_template('app.html', score=score, reviews=reviews, plates=plates, stars=stars, id=rest_id)
+  return render_template('app.html', score=score, reviews=reviews, plates=plates, stars=stars, id=rest_id, no_menu=response)
 
 @app.route('/testmain')
 def _testMain():
