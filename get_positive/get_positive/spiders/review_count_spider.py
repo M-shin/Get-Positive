@@ -22,17 +22,18 @@ class review_count_spider(CrawlSpider):
       # Get reviews/ratings on current page
       pretty_name = response.xpath('//h1[@class="biz-page-title embossed-text-white shortenough"]/text()').extract()[0].replace('\n', '').strip().encode('utf-8')
       count = int(response.xpath('//span[@itemprop="reviewCount"]/text()').extract()[0])
-      yield self.parse_count(count, pretty_name)
+      zip_code = response.xpath('//span[@itemprop="postalCode"]/text()').extract()[0]
+      yield self.parse_count(count, pretty_name, zip_code)
 
     else:
       time.sleep(10)
       yield scrapy.Request(response.url,callback=self.parse)
 
   # Parse page
-  def parse_count(self, count, pretty_name):
+  def parse_count(self, count, pretty_name, zip_code):
 
     writer = open('get_positive/get_positive/reviewCounts.csv', 'wb')
-    writer.write(str(count) + ',' + pretty_name)
+    writer.write(str(count) + ',' + pretty_name + ',' + zip_code)
     writer.close()
 
     item = ReviewCountItem(
