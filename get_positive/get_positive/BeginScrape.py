@@ -31,7 +31,7 @@ def scrapeReviews(url, restaurant_name):
   db = client['reviews_db']
   coll = db['reviews']
 
-  coll.delete_many({})
+  # coll.delete_many({})
 
   num = 0
   process = CrawlerProcess(get_project_settings())
