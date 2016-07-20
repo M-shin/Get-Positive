@@ -61,44 +61,14 @@ def _spinner():
 def _loading2():
   return render_template('loading2.html', id=request.args['id'])
 
-@app.route('/score', methods=['GET'])
-def _get_score():
+@app.route('/refine', methods=['GET'])
+def _refine():
   rest_id = request.args['id']
-  keyword = None
-  if request.args['keyword'] is not None:
-    keyword = request.args['keyword']
-
-  data = get_score(rest_id, keyword)
-  return jsonify(**data)
-
-@app.route('/reviews', methods=['GET'])
-def _get_reviews():
-  rest_id = request.args['id']
-  keyword = None
-  if request.args['keyword'] is not None:
-    keyword = request.args['keyword']
-  max_count = request.args['count']
-
-  data = get_top_reviews(rest_id, max_count, keyword)
-  return jsonify(**data)
-
-@app.route('/plates', methods=['GET'])
-def _get_plates():
-  rest_id = request.args['id']
-  keyword = None
-  if request.args['keyword'] is not None:
-    keyword = request.args['keyword']
-  max_count = request.args['count']
-
-  data = get_top_plates(rest_id, max_count, keyword)
-  return jsonify(**data)
-
-@app.route('/stars', methods=['GET'])
-def _get_stars():
-  rest_id = request.args['id']
-  keyword = None
-  if request.args['keyword'] is not None:
-    keyword = request.args['keyword']
-
-  data = get_review_distribution(rest_id, keyword)
+  keyword = request.args['keyword']
+  data = {
+    'score': get_score(rest_id, keyword),
+    'reviews': get_reviews(rest_id, 3, keyword),
+    'plates': get_plates(rest_id, 3, keyword),
+    'stars': get_review_distribution(rest_id, keyword)
+  }
   return jsonify(**data)
