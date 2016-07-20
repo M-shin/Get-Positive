@@ -28,7 +28,7 @@
 
 #inputField {
     width: 60%;
-    height: 18px;
+    height: 25px;
     border: none;
 }
 
@@ -37,5 +37,5 @@
     border: none;
     color: white;
     width: 20%;
-    height: 20px;
+    height: 28px;
 }

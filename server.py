@@ -14,7 +14,7 @@ def _index():
 @app.route('/prefetch', methods=['GET'])
 def _prefetch():
   url = request.args['url']
-#  rest_id = getReviewCount(url)
+  rest_id = getReviewCount(url)
 #  return rest_id
   return jsonify(**{'id': 'FANG', 'url': url})
 
@@ -26,7 +26,7 @@ def _appMain():
   # Perhaps a step here where we check if the data is already in Mongo
 
   # Begin by scraping the reviews
-  # scrapeReviews(url, rest_id)
+  scrapeReviews(url, rest_id)
 
   # Use model endpoints to access data
   score = get_score(rest_id)
