@@ -73,7 +73,6 @@ def search_by_restaurant(restaurant_query):
 
   return results
 
-
 # saves model parameters into restaurant objects
 def save_restaurant_model(name, model):
   client = MongoClient('mongodb://172.20.9.140:27017')
@@ -88,3 +87,12 @@ def get_restaurant_model(name):
   if len(cursor) > 0 and 'model' in cursor[0]:
     return cursor[0]['model']
   return None
+
+def get_menus_by_name(name):
+  client = MongoClient('mongodb://172.20.9.140:27017')
+  coll = client.reviews_db.reviews
+  cursor = list(coll.find({'name': re.compile(name, re.IGNORECASE)}))
+  if len(cursor) > 0:
+    return cursor[0]['menuItems']
+  else:
+    return None
