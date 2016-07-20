@@ -49,7 +49,7 @@ def _testMain():
   plates = ['Fish Soup', 'Fish Bowl', 'Fishy'];
   stars = {'1': 5, '2': 2, '3': 10, '4': 16, '5': 40}
 
-  return render_template('app.html', score=score, reviews=reviews, plates=plates, stars=stars, id='In-N-Out Burger')
+  return render_template('app.html', score=score, reviews=json.dumps(reviews), plates=json.dumps(plates), stars=json.dumps(stars), id='In-N-Out Burger')
 
 @app.route('/loading1')
 def _loading1():

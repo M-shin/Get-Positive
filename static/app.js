@@ -7,7 +7,8 @@ function getId() {
 
 function readMetadata() {
   var score = JSON.parse($('#score').attr('content'));
-  var reviewString = $('#reviews').attr('content'));
+  var reviewString = $('#reviews').attr('content');
+  console.log(reviewString);
   var reviews = JSON.parse(reviewString);
   var plates = JSON.parse($('#plates').attr('content'));
   var stars = JSON.parse($('#stars').attr('content'));
@@ -21,9 +22,7 @@ function updateSearchResultArea(data) {
 
 function refine() {
   var keyword = $('#inputField').val();
-  console.log('Requesting...')
   $.get('/refine?keyword=' + keyword + '&id=' + getId(), function(data) {
-    console.log('Done!')
     updateSearchResultArea(data);
   });
 }
@@ -38,7 +37,12 @@ function populateReviewArea(stars) {
   var ctx = $('#myChart');
   var data = {
     labels: ['1', '2', '3', '4', '5'],
-    data: [stars['1'], stars['2'], stars['3'], stars['4'], stars['5']]
+    datasets: [
+      {
+        data: [stars['1'], stars['2'], stars['3'], stars['4'], stars['5']],
+        backgroundColor: ['#f00','#0f0','#00f','#ff0','#0ff']
+      }
+    ]
   };
   var options = {};
   var doughnut = new Chart(ctx, {
@@ -49,7 +53,6 @@ function populateReviewArea(stars) {
 }
 
 function populateTopPlates(plates) {
-  console.log(plates);
 }
 
 $(document).ready(function() {
