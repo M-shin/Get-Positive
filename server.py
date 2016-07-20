@@ -13,14 +13,15 @@ def _index():
 @app.route('/prefetch', methods=['GET'])
 def _prefetch():
   url = request.args['url']
-  res = subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
+  subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
   rest_id = get_restaurant_name()
-  return jsonify(**{'id': rest_id, 'url': url})
+  print rest_id, url
+  return render_template('loading2.html', id=rest_id, url=url)
+  #  return jsonify(**{'id': rest_id, 'url': url})
 
 @app.route('/main', methods=['GET'])
 def _appMain():
-  time.sleep(10000)
   url = request.args['url']
   rest_id = request.args['id']
 
@@ -39,6 +40,10 @@ def _appMain():
 @app.route('/loading1')
 def _loading1():
   return render_template('loading1.html')
+
+@app.route('/spinner')
+def _spinner():
+  return render_template('spinner.html')
 
 @app.route('/loading2')
 def _loading2():
