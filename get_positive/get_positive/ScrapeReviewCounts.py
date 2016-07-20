@@ -1,3 +1,4 @@
+import argparse
 import csv
 import math
 
@@ -12,12 +13,18 @@ from pymongo import MongoClient
 
 # url = 'https://www.yelp.com/biz/fang-san-francisco-2'
 
+parser = argparse.ArgumentParser('Get counts/name')
+parser.add_argument('-u')
+args = parser.parse_args()
+
 def getReviewCount(url):
   # Get the number of reviews
   process = CrawlerProcess(get_project_settings())
   process.crawl(review_count_spider, start_url=url)
 
-  with open("reviewCounts.csv", 'rU') as csvfile:
-      reader = csv.reader(csvfile, delimiter = ',')
-      for row in reader:
-        return row[1]
+  # with open("reviewCounts.csv", 'rU') as csvfile:
+  #     reader = csv.reader(csvfile, delimiter = ',')
+  #     for row in reader:
+  #       return row[1]
+
+getReviewCount(args.u)

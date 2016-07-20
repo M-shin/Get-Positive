@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from get_positive.get_positive.items import ReviewCountItem
+from items import ReviewCountItem
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 import re
