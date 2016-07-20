@@ -62,7 +62,7 @@ def _spinner():
 
 @app.route('/loading2')
 def _loading2():
-  return render_template('loading2.html', id=request.args['id'])
+  return render_template('loading2.html', id=json.dumps(request.args['id']))
 
 @app.route('/refine', methods=['GET'])
 def _refine():
