@@ -57,5 +57,3 @@ def getMenuItems():
   )
 
   return 0
-
-print getMenuItems()
