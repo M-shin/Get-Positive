@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from get_positive.get_positive.items import YelpItem
+from items import YelpItem
 from datetime import datetime, timedelta
 import re
 from scrapy.selector import HtmlXPathSelector
