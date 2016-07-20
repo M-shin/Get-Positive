@@ -40,7 +40,7 @@ class yelp_spider(CrawlSpider):
         yield self.parse_review(page_reviews[i], ratings[i+1])
 
       # Paginate 5 pages
-      if response.xpath('//span[@class="pagination-label responsive-hidden-small pagination-links_anchor"]') and (self.page_num - self.start_page) <= 100:
+      if response.xpath('//span[@class="pagination-label responsive-hidden-small pagination-links_anchor"]') and (self.page_num - self.start_page) <= 80:
         self.page_num += 20
         base_url = self.start_urls[0].split('?start=')[0]
         yield scrapy.Request(base_url + '?start=' + str(self.page_num), callback=self.parse)

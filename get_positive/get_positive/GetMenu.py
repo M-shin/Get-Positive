@@ -2,7 +2,7 @@ import csv
 import requests
 import json
 
-import pymongo
+from pymongo import MongoClient
 
 def getMenuItems():
   name = ''
@@ -46,7 +46,7 @@ def getMenuItems():
                 pass
 
   menu_items = list(menu_items)
-  
+
   # Insert into DB
   client = MongoClient()
   db = client['reviews_db']
@@ -57,3 +57,5 @@ def getMenuItems():
   )
 
   return 0
+
+print getMenuItems()
