@@ -87,6 +87,5 @@ def _refine():
     'score': get_score(rest_id, keyword),
     'reviews': get_top_reviews(rest_id, 3, keyword),
     'plates': get_top_plates(rest_id, 3, keyword),
-    'stars': get_review_distribution(rest_id, keyword)
   }
   return jsonify(**data)

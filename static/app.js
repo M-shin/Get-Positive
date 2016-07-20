@@ -16,15 +16,20 @@ function readMetadata() {
   return {score: score, reviews: reviews, plates: plates, stars: stars};
 }
 
+function updateKSA(score) {
+  $('#ksa').html('<b>' + $('#inputField').val() + '</b> has a score of: <b>' + score + '</b>');
+}
+
 function updateSearchResultArea(data) {
-  populateReviewArea(data.stars);
   populateTopPlates(data.plates);
-  populateSRA(data.reviews)
+  populateSRA(data.reviews);
+  updateKSA(data.score);
 }
 
 function refine() {
   var keyword = $('#inputField').val();
   $.get('/refine?keyword=' + keyword + '&id=' + getId(), function(data) {
+    console.log(JSON.stringify(data));
     updateSearchResultArea(data);
   });
 }
@@ -62,14 +67,20 @@ function populateSRA(reviews) {
 }
 
 function populateTopPlates(plates) {
-  $('#plate1').html(plates[0]);
-  $('#plate2').html(plates[1]);
-  $('#plate3').html(plates[2]);
+  for (var i = 0; i < 3; i++) {
+    $('#plate' + (i + 1)).html('<b>' + plates[i]['plate'] + '</b> with score of: <b>' + plates[i]['score'] + '</b>');
+  }
+}
+
+function populateSubHeader(score) {
+  $('#subHeaderText').html('Overall Score: <b>' + score + '</b>');
 }
 
 $(document).ready(function() {
   data = readMetadata();
+  console.log(JSON.stringify(data));
   populateReviewArea(data.stars);
   populateTopPlates(data.plates);
   populateSRA(data.reviews);
+  populateSubHeader(data.score);
 });
