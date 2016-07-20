@@ -17,29 +17,36 @@
         </div>
       </div>
     </div>
-    <div id="reviewArea">
-      <div id="reviewDistribution">
-        <canvas id="myChart" height="100" width="400"></canvas>
-      </div>
-    </div>
+    <table style="width:100%">
+      <tr>
+        <col>
+          <div id="reviewArea">
+            <div id="reviewDistribution">
+              <canvas id="myChart" height="100" width="400"></canvas>
+            </div>
+          </div>
+        </col>
+        <col>
+          <div id="platesArea">
+            <div id="platesText">
+              TOP PLATES
+            </div>
+            <div id="plate1"></div>
+            <div id="plate2"></div>
+            <div id="plate3"></div>
+          </div>
+        </col>
+      </tr>
+    </table>
     <div id="searchArea">
       <div id="bigTextPlace">STILL HUNGRY?</div>
       <div id="smallTextPlace">Refine your search below</div>
       <div id="formArea">
-      <input id="inputField" placeholder="Ex. Chicken..." name="keyword">
-      <button id="inputButton" onclick="refine()">GET POSITIVE</button>
+        <input id="inputField" placeholder="Ex. Chicken..." name="keyword">
+        <button id="inputButton" onclick="refine()">GET POSITIVE</button>
       </div>
-      </div>
-    <div id="searchResultsArea">
     </div>
-    <div id="platesArea">
-      <div id="platesText">
-        TOP PLATES
-      </div>
-      <div id="plate1"></div>
-      <div id="plate2"></div>
-      <div id="plate3"></div>
-    </div>
+    <div id="searchResultsArea"></div>
   </body>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
