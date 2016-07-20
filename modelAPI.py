@@ -2,9 +2,7 @@ from __future__ import division
 import csv
 from functions import mongo
 import math
-import multiprocessing
 from multiprocessing.pool import Pool
-import os
 import time
 # from urllib2 import unquote
 # from urllib2 import quote
@@ -104,7 +102,6 @@ def run_computation(args):
     return items
 
 def score_reviews(model):
-    os.system("taskset -p 0xff %d" % os.getpid())
     reviews = []
 
     processes = []

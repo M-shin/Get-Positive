@@ -49,4 +49,17 @@ def scrapeReviews(url, restaurant_name):
 
   process.start()
 
+  reviews = []
+  good = []
+  for review in list(coll.find({'name': restaurant_name}))[0]['reviews']:
+    if review['body'] not in reviews:
+      reviews.append(review['body'])
+      good.append(review)
+  reviews = list(set(reviews))
+  reviews = [item for item in good if item['body'] in reviews]
+  coll.update_one(
+      {'name': restaurant_name},
+      {'$set': {'reviews': reviews}}
+    )
+
 scrapeReviews(args.u, args.n)
