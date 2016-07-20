@@ -23,8 +23,6 @@ class review_count_spider(CrawlSpider):
       pretty_name = response.xpath('//h1[@class="biz-page-title embossed-text-white shortenough"]/text()').extract()[0].replace('\n', '').strip().encode('ascii', 'ignore')
       count = int(response.xpath('//span[@itemprop="reviewCount"]/text()').extract()[0])
       zip_code = response.xpath('//span[@itemprop="postalCode"]/text()').extract()[0]
-      print pretty_name
-      print 'gxmattprice'
       yield self.parse_count(count, pretty_name, zip_code)
 
     else:
