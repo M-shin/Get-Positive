@@ -53,6 +53,24 @@ def compute_likelihood(num_stars, review, model):
 
     return prob
 
+def compute_bigram_likelihood(num_stars, review, model):
+    # compute prior log probability
+    update_prior_probabilities(model)
+    prior_string = "P_" + num_stars + "_prior"
+    # print "prior: ", model[prior_string]
+    # print "prior_real: ", len(model['1_0']) / get_num_reviews(model)
+    prob = math.log(model['bigram'][prior_string])
+
+    # add the posterior log probabilities of the review's terms naively
+    posterior_string = "P_" + num_stars + "_counts"
+    total_count = model['bigram'][posterior_string]['total_count']
+    for term in model['bigram'][posterior_string]:
+        initialize_posterior_counts(term, model)
+        posterior_prob = math.log((model['bigram'][posterior_string][term] + 1) / (total_count + model['bigram']['dictionary_size']))  # uses Laplace smoothing
+        prob += posterior_prob
+
+    return prob
+
 
 def score_term_reviews(term, model):
     result = []
@@ -138,6 +156,12 @@ def get_total_term_count(term, model):
                   model['P_4_0_counts'][term] + model['P_4_5_counts'][term] + model['P_5_0_counts'][term]
 
 
+def get_total_bigram_term_count(term, model):
+    initialize_bigram_posterior_counts(term, model)
+    return model['bigram']['P_1_0_counts'][term] + model['bigram']['P_1_5_counts'][term] + model['bigram']['P_2_0_counts'][term] + \
+           model['bigram']['P_2_5_counts'][term] + model['bigram']['P_3_0_counts'][term] + model['bigram']['P_3_5_counts'][term] + \
+           model['bigram']['P_4_0_counts'][term] + model['bigram']['P_4_5_counts'][term] + model['bigram']['P_5_0_counts'][term]
+
 def get_plates(rest_id):
     plates = mongo.get_menus_by_name(rest_id)
     result = []
@@ -153,19 +177,19 @@ def get_plates(rest_id):
         if len(terms) == 1:
             if is_wine == 'false':
                 result.append((plate, get_term_score(plate, model)))
-        else:
+        elif len(terms) >= 2:
             max_terms = 0
             max_dish = "No Plates Found"
-            for i in range(0,len(terms)):
-                dish = clean_term(terms[i])  #+ " " + clean_term(terms[i+1])
-                if any(dish in s for s in wine_set):
-                    is_wine = 'true'
-                num_terms = get_total_term_count(dish, model)
+            for i in range(0,len(terms)-1):
+                dish = clean_term(terms[i]) + " " + clean_term(terms[i+1])
+                # if any(dish in s for s in wine_set):
+                #     is_wine = 'true'
+                num_terms = get_total_bigram_term_count(dish, model)
                 if num_terms > max_terms:
                     max_terms = num_terms
                     max_dish = dish
-            if is_wine == 'false':
-                result.append((plate, get_term_score(max_dish, model)))
+            # if is_wine == 'false':
+            result.append((plate, get_bigram_term_score(max_dish, model)))
 
     # print "plates: ", result
 
@@ -193,6 +217,27 @@ def initialize_posterior_counts(term, model):
         model['P_5_0_counts'][term] = 0
 
 
+def initialize_bigram_posterior_counts(term, model):
+    if term not in model['bigram']['P_1_0_counts']:
+        model['bigram']['P_1_0_counts'][term] = 0
+    if term not in model['bigram']['P_1_5_counts']:
+        model['bigram']['P_1_5_counts'][term] = 0
+    if term not in model['bigram']['P_2_0_counts']:
+        model['bigram']['P_2_0_counts'][term] = 0
+    if term not in model['bigram']['P_2_5_counts']:
+        model['bigram']['P_2_5_counts'][term] = 0
+    if term not in model['bigram']['P_3_0_counts']:
+        model['bigram']['P_3_0_counts'][term] = 0
+    if term not in model['bigram']['P_3_5_counts']:
+        model['bigram']['P_3_5_counts'][term] = 0
+    if term not in model['bigram']['P_4_0_counts']:
+        model['bigram']['P_4_0_counts'][term] = 0
+    if term not in model['bigram']['P_4_5_counts']:
+        model['bigram']['P_4_5_counts'][term] = 0
+    if term not in model['bigram']['P_5_0_counts']:
+        model['bigram']['P_5_0_counts'][term] = 0
+
+
 def get_term_likelihood_score(term, model):
     initialize_posterior_counts(term, model)
     total_term_count = get_total_term_count(term, model)
@@ -201,6 +246,24 @@ def get_term_likelihood_score(term, model):
     s3 = (model['P_3_0_counts'][term] / model['P_3_0_counts']['total_count'])
     s4 = (model['P_4_0_counts'][term] / model['P_4_0_counts']['total_count'])
     s5 = (model['P_5_0_counts'][term] / model['P_5_0_counts']['total_count'])
+    sum = s1+s2+s3+s4+s5
+
+    if sum != 0:
+        # print "score: ", (s1/sum) + (s2/sum)*2 + (s3/sum)*3 + (s4/sum)*4 + (s5/sum)*5
+        result = (s1/sum) + (s2/sum)*2 + (s3/sum)*3 + (s4/sum)*4 + (s5/sum)*5
+        return result
+    else:
+        return -1
+
+
+def get_bigram_term_likelihood_score(term, model):
+    initialize_bigram_posterior_counts(term, model)
+    total_term_count = get_total_bigram_term_count(term, model)
+    s1 = (model['bigram']['P_1_0_counts'][term] / model['bigram']['P_1_0_counts']['total_count'])
+    s2 = (model['bigram']['P_2_0_counts'][term] / model['bigram']['P_2_0_counts']['total_count'])
+    s3 = (model['bigram']['P_3_0_counts'][term] / model['bigram']['P_3_0_counts']['total_count'])
+    s4 = (model['bigram']['P_4_0_counts'][term] / model['bigram']['P_4_0_counts']['total_count'])
+    s5 = (model['bigram']['P_5_0_counts'][term] / model['bigram']['P_5_0_counts']['total_count'])
     sum = s1+s2+s3+s4+s5
 
     if sum != 0:
@@ -227,6 +290,11 @@ def get_term_score(term, model):
 
     return get_term_likelihood_score(term, model)
     # return get_term_score_2(term, model)
+
+
+def get_bigram_term_score(term, model):
+    return get_bigram_term_likelihood_score(term, model)
+
 
 def get_term_score_2(term, model):
     initialize_posterior_counts(term, model)
@@ -294,6 +362,20 @@ def update_prior_probabilities(retrieved_model):
     retrieved_model['P_4_0_prior'] = len(retrieved_model['4_0']) / num_reviews
     retrieved_model['P_4_5_prior'] = len(retrieved_model['4_5']) / num_reviews
     retrieved_model['P_5_0_prior'] = len(retrieved_model['5_0']) / num_reviews
+
+
+def update_bigram_prior_probabilities(retrieved_model):
+    # print "model: ", retrieved_model
+    num_reviews = get_num_reviews(retrieved_model)
+    retrieved_model['bigram']['P_1_0_prior'] = len(retrieved_model['1_0']) / num_reviews
+    retrieved_model['bigram']['P_1_5_prior'] = len(retrieved_model['1_5']) / num_reviews
+    retrieved_model['bigram']['P_2_0_prior'] = len(retrieved_model['2_0']) / num_reviews
+    retrieved_model['bigram']['P_2_5_prior'] = len(retrieved_model['2_5']) / num_reviews
+    retrieved_model['bigram']['P_3_0_prior'] = len(retrieved_model['3_0']) / num_reviews
+    retrieved_model['bigram']['P_3_5_prior'] = len(retrieved_model['3_5']) / num_reviews
+    retrieved_model['bigram']['P_4_0_prior'] = len(retrieved_model['4_0']) / num_reviews
+    retrieved_model['bigram']['P_4_5_prior'] = len(retrieved_model['4_5']) / num_reviews
+    retrieved_model['bigram']['P_5_0_prior'] = len(retrieved_model['5_0']) / num_reviews
 
 
 def get_wine_set():
@@ -388,6 +470,129 @@ def train_model(retrieved_model):
     return retrieved_model
 
 
+def train_bigram_model(retrieved_model):
+    # initialize_bigrams(retrieved_model)
+
+    # compute prior probabilities
+    update_bigram_prior_probabilities(retrieved_model)
+
+    # compute posterior probabilities
+    terms_set = set() # set of unique terms
+    retrieved_model['bigram']['P_1_0_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['1_0']:
+        terms = review.split()
+        for i in range(0,len(terms)-1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i+1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_1_0_counts'][term] = retrieved_model['bigram']['P_1_0_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_1_0_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_1_5_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['1_5']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_1_5_counts'][term] = retrieved_model['bigram']['P_1_5_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_1_5_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_2_0_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['2_0']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_2_0_counts'][term] = retrieved_model['bigram']['P_2_0_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_2_0_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_2_5_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['2_5']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_2_5_counts'][term] = retrieved_model['bigram']['P_2_5_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_2_5_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_3_0_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['3_0']:
+        for term in review.split():
+            term = clean_term(term)
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_3_0_counts'][term] = retrieved_model['bigram']['P_3_0_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_3_0_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_3_5_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['3_5']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_3_5_counts'][term] = retrieved_model['bigram']['P_3_5_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_3_5_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_4_0_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['4_0']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_4_0_counts'][term] = retrieved_model['bigram']['P_4_0_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_4_0_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_4_5_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['4_5']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_4_5_counts'][term] = retrieved_model['bigram']['P_4_5_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_4_5_counts']['total_count'] += 1
+    retrieved_model['bigram']['P_5_0_counts']['total_count'] = 0
+    for review in retrieved_model['bigram']['5_0']:
+        terms = review.split()
+        for i in range(0, len(terms) - 1):
+            term = clean_term(terms[i]) + " " + clean_term(terms[i + 1])
+            if term:
+                terms_set.add(term)
+                retrieved_model['bigram']['P_5_0_counts'][term] = retrieved_model['bigram']['P_5_0_counts'].get(term, 0) + 1
+                retrieved_model['bigram']['P_5_0_counts']['total_count'] += 1
+    retrieved_model['bigram']['dictionary_size'] = len(terms_set)
+    return retrieved_model
+
+
+def initialize_bigram_model(retrieved_model):
+    retrieved_model['bigram'] = dict()
+    retrieved_model['bigram']['1_0'] = []
+    retrieved_model['bigram']['1_5'] = []
+    retrieved_model['bigram']['2_0'] = []
+    retrieved_model['bigram']['2_5'] = []
+    retrieved_model['bigram']['3_0'] = []
+    retrieved_model['bigram']['3_5'] = []
+    retrieved_model['bigram']['4_0'] = []
+    retrieved_model['bigram']['4_5'] = []
+    retrieved_model['bigram']['5_0'] = []
+    retrieved_model['bigram']['P_1_prior'] = 0.0
+    retrieved_model['bigram']['P_1_5_prior'] = 0.0
+    retrieved_model['bigram']['P_2_prior'] = 0.0
+    retrieved_model['bigram']['P_2_5_prior'] = 0.0
+    retrieved_model['bigram']['P_3_prior'] = 0.0
+    retrieved_model['bigram']['P_3_5_prior'] = 0.0
+    retrieved_model['bigram']['P_4_prior'] = 0.0
+    retrieved_model['bigram']['P_4_5_prior'] = 0.0
+    retrieved_model['bigram']['P_5_prior'] = 0.0
+    retrieved_model['bigram']['P_1_0_counts'] = dict()
+    retrieved_model['bigram']['P_1_5_counts'] = dict()
+    retrieved_model['bigram']['P_2_0_counts'] = dict()
+    retrieved_model['bigram']['P_2_5_counts'] = dict()
+    retrieved_model['bigram']['P_3_0_counts'] = dict()
+    retrieved_model['bigram']['P_3_5_counts'] = dict()
+    retrieved_model['bigram']['P_4_0_counts'] = dict()
+    retrieved_model['bigram']['P_4_5_counts'] = dict()
+    retrieved_model['bigram']['P_5_0_counts'] = dict()
+
+
 # Returns a trained model
 def get_model(restaurant):
     # retrieve model from DB
@@ -425,33 +630,38 @@ def get_model(restaurant):
         retrieved_model['P_4_0_counts'] = dict()
         retrieved_model['P_4_5_counts'] = dict()
         retrieved_model['P_5_0_counts'] = dict()
+        initialize_bigram_model(retrieved_model)
 
         # process reviews
         for review in data:
             rating = str(review['rating']).replace('.', '_')
             retrieved_model[rating].append(review['body'])
 
+            retrieved_model['bigram'][rating].append(review['body'])
+
         # train model
         trained_model = train_model(retrieved_model)
+        trained_bigram_model = train_bigram_model(trained_model)
         # print "trained_model", trained_model
-        mongo.save_restaurant_model(restaurant, trained_model)
-        return trained_model
+        mongo.save_restaurant_model(restaurant, trained_bigram_model)
+        return trained_bigram_model
     else:
         return mongo.get_restaurant_model(restaurant)
 
 
-# def main():
-#     model = get_model("Fang")
-#     print "Model: ", model
-#     print "Score: ", get_term_score_2("service", model)
-#     print "likelihood score: ", get_term_likelihood_score("service", model)
-#     print "review_distribution: ", get_review_distribution("fang")
-#     print "General Score: ", get_score("Fang")
-#     print "get_top_reviews: ", get_top_reviews("Fang", 3)
-#     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "chicken")
-#     get_plates("Fang")
-#     top_plates = get_top_plates("Fang", 3)
-#     print "top_plates: ", top_plates
-#
-# if __name__ == "__main__":
-#     main()
+def main():
+    model = get_model("Fang")
+    print "Model: ", model
+    print "Score: ", get_term_score_2("service", model)
+    print "likelihood score: ", get_term_likelihood_score("service", model)
+    print "review_distribution: ", get_review_distribution("fang")
+    print "General Score: ", get_score("Fang")
+    print "get_top_reviews: ", get_top_reviews("Fang", 3)
+    print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "service")
+    get_plates("Fang")
+    top_plates = get_top_plates("Fang", 3)
+    print "top_plates: ", top_plates
+
+
+if __name__ == "__main__":
+    main()
