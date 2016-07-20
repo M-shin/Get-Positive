@@ -54,7 +54,7 @@ function populateReviewArea(stars) {
     datasets: [
       {
         data: [stars['1'], stars['2'], stars['3'], stars['4'], stars['5']],
-        backgroundColor: ['#f00','#0f0','#00f','#ff0','#0ff']
+        backgroundColor: ['#c00','#0c0','#00c','#cc0','#0cc']
       }
     ]
   };
@@ -66,7 +66,56 @@ function populateReviewArea(stars) {
   });
 }
 
+function computePre(s, i) {
+  var I = [s.lastIndexOf('.', i + 1), s.lastIndexOf('?', i + 1), s.lastIndexOf('!', i + 1)];
+  I = I.filter(i => i > -1);
+  if (I.length === 0) {
+    return 0;
+  }
+  var max = I[0];
+  for (var i = 1; i < I.length; i++) {
+    max = Math.max(max, I[i]);
+  }
+  return max;
+}
+
+function computePost(s, i) {
+  var I = [s.indexOf('.', i + 1), s.indexOf('?', i + 1), s.indexOf('!', i + 1)];
+  I = I.filter(i => i > -1);
+  if (I.length === 0) {
+    return s.length;
+  }
+  var min = I[0];
+  for (var i = 1; i < I.length; i++) {
+    min = Math.min(min, I[i]);
+  }
+  return min;
+}
+
+function bold(s, i, l) {
+  var nextSpace = s.indexOf(' ', i);
+  return '"...' + s.slice(0, i) + '<b id="kmatch">' + s.slice(i, nextSpace) + '</b>' + s.slice(nextSpace) + '..."';
+}
+
 function populateSRA(reviews) {
+  var keyword = $('#inputField').val().toLowerCase();
+  console.log(keyword);
+  if (keyword) {
+    reviews.filter(review => review.review_text.toLowerCase().indexOf(keyword) != -1);
+    for (var i = 0; i < reviews.length; i++) {
+      reviews[i].review_text = reviews[i].review_text.split('<br>').join('');
+      var index = reviews[i].review_text.toLowerCase().indexOf(keyword);
+      console.log(index);
+      var pre = computePre(reviews[i].review_text, index);
+      var post = computePost(reviews[i].review_text, index);
+      reviews[i].review_text = reviews[i].review_text.slice(pre + 1, post);
+      var newIndex = reviews[i].review_text.toLowerCase().indexOf(keyword);
+      reviews[i].review_text = bold(reviews[i].review_text, newIndex, keyword.length);
+    }
+  }
+  for (var i = 0; i < 3; i++) {
+    $('#sra' + (i + 1)).html('');
+  }
   for (var i = 0; i < reviews.length; i++) {
     $('#sra' + (i + 1)).html('- ' + reviews[i].review_text.replace('<br>', ''));
   }
@@ -74,7 +123,7 @@ function populateSRA(reviews) {
 
 function populateTopPlates(plates) {
   for (var i = 0; i < plates.length; i++) {
-    $('#plate' + (i + 1)).html('<b>' + plates[i]['plate'] + '</b> with score of: <b>' + plates[i]['score'] + '</b>');
+    $('#plate' + (i + 1)).html('<b>' + plates[i]['plate'] + '</b> with score of: <b>' + (0.0 + plates[i]['score']).toFixed(2) + '</b>');
   }
 }
 
@@ -96,7 +145,8 @@ $(document).ready(function() {
   data = readMetadata();
   console.log(JSON.stringify(data));
   populateReviewArea(data.stars);
-  if (hasMenu() && data.plates.length > 0) {
+  console.log('Has menu?: ' + hasMenu());
+  if (data.plates.length > 0) {
     populateTopPlates(data.plates);
   } else {
     renderTopPlateWarning();

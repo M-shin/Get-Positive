@@ -1,3 +1,9 @@
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    font-family: 'Raleway', sans-serif;
+}
+
 #body {
     background-color: #cc0000;
     color: white;
