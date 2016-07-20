@@ -47,7 +47,7 @@ def compute_likelihood(num_stars, review, model):
     posterior_string = "P_" + num_stars + "_counts"
     total_count = model[posterior_string]['total_count']
     for term in model[posterior_string]:
-        # print "term: ", term
+        initialize_posterior_counts(term, model)
         posterior_prob = math.log((model[posterior_string][term] + 1) / (total_count + model['dictionary_size']))  # uses Laplace smoothing
         prob += posterior_prob
 
@@ -146,17 +146,19 @@ def get_plates(rest_id):
     for plate in plates:
         is_wine = 'false'
         plate = plate.lower()
-        # if plate not in wine_set:
+        # if plate in wine_set:
+        if any(plate in s for s in wine_set):
+            is_wine = 'true'
         terms = plate.split()
         if len(terms) == 1:
-            if plate not in wine_set:
+            if is_wine == 'false':
                 result.append((plate, get_term_score(plate, model)))
         else:
             max_terms = 0
             max_dish = "No Plates Found"
             for i in range(0,len(terms)):
                 dish = clean_term(terms[i])  #+ " " + clean_term(terms[i+1])
-                if dish not in wine_set:
+                if any(dish in s for s in wine_set):
                     is_wine = 'true'
                 num_terms = get_total_term_count(dish, model)
                 if num_terms > max_terms:
@@ -256,7 +258,7 @@ def get_top_plates(rest_id, max_count, keyword=None):
         result.append(plate)
         count += 1
 
-    return result  # [{'plate': 'chicken', 'score': 4.9}]
+    return result
 
 
 def get_review_distribution(rest_id, keyword=None):
@@ -265,6 +267,7 @@ def get_review_distribution(rest_id, keyword=None):
         return {'1': len(model['1_0']), '1.5': len(model['1_5']), '2': len(model['2_0']), '2.5': len(model['2_5']), \
                 '3': len(model['3_0']), '3.5': len(model['3_5']), '4': len(model['4_0']), '4.5': len(model['4_5']), \
                 '5': len(model['5_0'])}
+
 
 
 # Returns total number of reviews for a restaurant
@@ -294,10 +297,10 @@ def update_prior_probabilities(retrieved_model):
 
 
 def get_wine_set():
-    wine_set = set()
+    wine_set = []
     with open("wine.txt", "r") as ins:
         for line in ins:
-            wine_set.add(line)
+            wine_set.append(line.lower())
     return wine_set
 
 
@@ -445,7 +448,7 @@ def get_model(restaurant):
 #     print "review_distribution: ", get_review_distribution("fang")
 #     print "General Score: ", get_score("Fang")
 #     print "get_top_reviews: ", get_top_reviews("Fang", 3)
-#     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "service")
+#     print "get_top_term_reviews: ", get_top_reviews("Fang", 3, "chicken")
 #     get_plates("Fang")
 #     top_plates = get_top_plates("Fang", 3)
 #     print "top_plates: ", top_plates
