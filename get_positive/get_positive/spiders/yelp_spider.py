@@ -48,7 +48,7 @@ class yelp_spider(CrawlSpider):
 
   # Parse page
   def parse_review(self, review, rating):
-    clean_review = re.sub(r'<p itemprop="description".+?>', '', review.replace('</p>', ''))
+    clean_review = (re.sub(r'<p itemprop="description".+?>', '', review.replace('</p>', ''))).encode('utf-8')
     clean_rating = float(rating.split('content')[1][2:5])
 
     self.coll.update_one(
