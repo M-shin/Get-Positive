@@ -30,7 +30,9 @@ def _appMain():
   subprocess.call(['python', 'get_positive/get_positive/BeginScrape.py', '-u', url, '-n', rest_id])
 
   # Populate database with menu items
-  getMenuItems()
+  response = getMenuItems()
+  if response == 1:
+    print 'ERRORRRRRRRRRRRR'
 
   # Use model endpoints to access data
   score = get_score(rest_id)
