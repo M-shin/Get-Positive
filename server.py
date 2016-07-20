@@ -2,7 +2,6 @@ from flask import Flask, jsonify, render_template, request
 from modelAPI import *
 from get_positive.get_positive.GetMenu import getMenuItems
 import subprocess
-import time
 
 NUM_REVIEWS = 5
 app = Flask(__name__)
