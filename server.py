@@ -1,9 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 from modelAPI import *
 import subprocess
-import time
-#from get_positive.get_positive.BeginScrape import scrapeReviews
-#from get_positive.get_positive.ScrapeReviewCounts import getReviewCount
 
 NUM_REVIEWS = 5
 app = Flask(__name__)
@@ -15,9 +12,9 @@ def _index():
 @app.route('/prefetch', methods=['GET'])
 def _prefetch():
   url = request.args['url']
-  res = subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', 'http://www.yelp.com/biz/fang-san-francisco-2'])
+  res = subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
-  rest_id = res
+  rest_id = get_restaurant_name()
   return jsonify(**{'id': rest_id, 'url': url})
 
 @app.route('/main', methods=['GET'])
@@ -28,7 +25,7 @@ def _appMain():
   # Perhaps a step here where we check if the data is already in Mongo
 
   # Begin by scraping the reviews
-  subprocess.call(['python', 'get_positive/get_positive/BeginScrape.py', '-u', 'http://www.yelp.com/biz/fang-san-francisco-2', '-n', 'Fang'])
+  subprocess.call(['python', 'get_positive/get_positive/BeginScrape.py', '-u', url, '-n', rest_id])
   # Use model endpoints to access data
   score = get_score(rest_id)
   reviews = get_top_reviews(rest_id, NUM_REVIEWS)
