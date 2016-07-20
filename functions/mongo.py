@@ -4,7 +4,7 @@ import re
 # returns all restaurant objects in database
 # restaurant objects contain name, url, list of reviews, and menu items
 def get_all_restaurants():
-  client = MongoClient('mongodb://172.20.9.140:27017')
+  client = MongoClient()
   coll = client.reviews_db.reviews
   cursor = coll.find()
   return list(cursor)
@@ -15,7 +15,7 @@ def find_restaurant_info(restaurant_query):
   restaurant_query = ' '.join(restaurant_query.split())
   restaurants = get_all_restaurants()
   results = []
-  
+
   for restaurant in restaurants:
     restaurant_name = ' '.join(restaurant['name'].split())
     if restaurant_query.lower() == restaurant_name.lower():
@@ -73,18 +73,26 @@ def search_by_restaurant(restaurant_query):
 
   return results
 
-
 # saves model parameters into restaurant objects
 def save_restaurant_model(name, model):
-  client = MongoClient('mongodb://172.20.9.140:27017')
+  client = MongoClient()
   coll = client.reviews_db.reviews
-  cursor = coll.update({'name': re.compile(name, re.IGNORECASE)}, {'$set': {'model': model}})  
+  cursor = coll.update({'name': re.compile(name, re.IGNORECASE)}, {'$set': {'model': model}})
 
 # returns model of a particular restaurant
 def get_restaurant_model(name):
-  client = MongoClient('mongodb://172.20.9.140:27017')
+  client = MongoClient()
   coll = client.reviews_db.reviews
   cursor = list(coll.find({'name': re.compile(name, re.IGNORECASE)}))
   if len(cursor) > 0 and 'model' in cursor[0]:
     return cursor[0]['model']
   return None
+
+def get_menus_by_name(name):
+  client = MongoClient('mongodb://172.20.9.140:27017')
+  coll = client.reviews_db.reviews
+  cursor = list(coll.find({'name': re.compile(name, re.IGNORECASE)}))
+  if len(cursor) > 0:
+    return cursor[0]['menuItems']
+  else:
+    return None
