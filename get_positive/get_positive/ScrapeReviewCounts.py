@@ -22,9 +22,4 @@ def getReviewCount(url):
   process = CrawlerProcess(get_project_settings())
   process.crawl(review_count_spider, start_url=url)
 
-  # with open("reviewCounts.csv", 'rU') as csvfile:
-  #     reader = csv.reader(csvfile, delimiter = ',')
-  #     for row in reader:
-  #       return row[1]
-
 getReviewCount(args.u)
