@@ -56,4 +56,6 @@ def getMenuItems():
     {'$set': {'menuItems': menu_items}}
   )
 
+  print 'Finished gathering menu'
+
   return 0

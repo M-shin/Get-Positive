@@ -20,7 +20,7 @@ class review_count_spider(CrawlSpider):
 
     if response.status < 600:
       # Get reviews/ratings on current page
-      pretty_name = response.xpath('//h1[@class="biz-page-title embossed-text-white shortenough"]/text()').extract()[0].replace('\n', '').strip().encode('utf-8')
+      pretty_name = response.xpath('//h1[@class="biz-page-title embossed-text-white shortenough"]/text()').extract()[0].replace('\n', '').strip().encode('ascii', 'ignore')
       count = int(response.xpath('//span[@itemprop="reviewCount"]/text()').extract()[0])
       zip_code = response.xpath('//span[@itemprop="postalCode"]/text()').extract()[0]
       yield self.parse_count(count, pretty_name, zip_code)
