@@ -67,13 +67,13 @@ function populateReviewArea(stars) {
 }
 
 function populateSRA(reviews) {
-  $('#sra1').html(reviews[0].review_text);
-  $('#sra2').html(reviews[1].review_text);
-  $('#sra3').html(reviews[2].review_text);
+  for (var i = 0; i < reviews.length; i++) {
+    $('#sra' + (i + 1)).html('- ' + reviews[i].review_text.replace('<br>', ''));
+  }
 }
 
 function populateTopPlates(plates) {
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < plates.length; i++) {
     $('#plate' + (i + 1)).html('<b>' + plates[i]['plate'] + '</b> with score of: <b>' + plates[i]['score'] + '</b>');
   }
 }
