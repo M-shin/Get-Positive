@@ -17,12 +17,10 @@ def _prefetch():
   subprocess.call(['python', 'get_positive/get_positive/ScrapeReviewCounts.py', '-u', url])
 
   rest_id = get_restaurant_name()
-  print rest_id, url
   return render_template('loading2.html', id=rest_id, url=url)
 
 @app.route('/main', methods=['GET'])
 def _appMain():
-  time.sleep(10000)
   url = request.args['url']
   rest_id = request.args['id']
 
