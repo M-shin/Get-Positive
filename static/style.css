@@ -140,7 +140,7 @@ a {
     width: 100%;
     position: absolute;
     color: white;
-    top: 85%;
+    top: 75%;
     text-align: center;
 }
 
@@ -163,7 +163,7 @@ a {
 #formArea {
     position: absolute;
     width: 100%;
-    top: 60%;
+    top: 55%;
 }
 
 #inputField {

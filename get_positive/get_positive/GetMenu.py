@@ -30,7 +30,10 @@ def getMenuItems():
 
   # Restaurant/zip code combo not found
   if len(response['venues']) == 0:
-  	return 1
+    return 1
+
+  if ('menus' not in response['venues'][0]):
+    return 1
 
   # Get menu items
   menu_items = set([])
