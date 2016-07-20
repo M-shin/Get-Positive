@@ -1,7 +1,7 @@
 // Main javascript file for landing.html
 
 function handleSubmit() {
-  $('#loadingArea').load('/loading1');
+  $('#spinnerArea').load('/spinner');
 
   var url = $('#inputField').val();
   $.get('/prefetch?url=' + url, function(data) {
