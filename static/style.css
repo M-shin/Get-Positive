@@ -35,6 +35,14 @@
     height: 20%;
 }
 
+#reviewText {
+    color: red;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 10%;
+}
+
 #searchArea {
     position: absolute;
     width: 100%;
