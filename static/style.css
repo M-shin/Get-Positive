@@ -1,12 +1,16 @@
+a {
+    color: cyan;
+}
+
 #body {
+    background-image: url("img/img1.jpeg");
+    background-size: cover;
     width: 100%;
     height: 100%;
     margin: 0px;
 }
 
 #headerArea {
-    background-image: url("img/img1.jpeg");
-    background-size: cover;
     width: 100%;
     position: absolute;
     top: 0%;
@@ -58,7 +62,7 @@
 }
 
 #reviewText {
-    color: red;
+    color: #cc0000;
     position: absolute;
     width: 100%;
     text-align: center;
@@ -69,9 +73,9 @@
 #searchArea {
     position: absolute;
     width: 100%;
-    top: 47%;
-    height: 20%;
-    background-color: red;
+    top: 42%;
+    height: 25%;
+    background-color: rgba(208, 0, 0, 0.7);
     text-align: center;
 }
 
@@ -122,8 +126,8 @@
 #smallTextPlace {
     width: 100%;
     position: absolute;
-    color: black;
-    top: 33%;
+    color: white;
+    top: 30%;
 }
 
 #ksa {
@@ -144,7 +148,7 @@
 #platesText {
     width: 100%;
     position: absolute;
-    color: red;
+    color: #cc0000;
     font-size: 25px;
     top: 5%;
     text-align: center;
