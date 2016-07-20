@@ -55,6 +55,7 @@ function populateReviewArea(stars) {
 }
 
 function populateSRA(reviews) {
+  console.log('R: ' + reviews);
   $('#sra1').html(reviews[0].review_text);
   $('#sra2').html(reviews[1].review_text);
   $('#sra3').html(reviews[2].review_text);
@@ -70,5 +71,5 @@ $(document).ready(function() {
   data = readMetadata();
   populateReviewArea(data.stars);
   populateTopPlates(data.plates);
-  populateSRA(reviews);
+  populateSRA(data.reviews);
 });

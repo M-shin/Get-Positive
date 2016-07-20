@@ -47,7 +47,20 @@ def _appMain():
 def _testMain():
   # Use model endpoints to access data
   score = 5.0
-  reviews = ['Wow you guys are good', 'Like, real good', 'JK you suck hahahaha'];
+  reviews = [
+    {
+      'num_stars': 5,
+      'review_text': 'Wow you guys are good'
+    },
+    {
+      'num_stars': 4,
+      'review_text': 'Like, real good'
+    },
+    {
+      'num_stars': 4,
+      'review_text': 'Like, real good'
+    },
+  ];
   plates = ['Fish Soup', 'Fish Bowl', 'Fishy'];
   stars = {'1': 5, '2': 2, '3': 10, '4': 16, '5': 40}
 
