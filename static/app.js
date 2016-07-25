@@ -70,7 +70,7 @@ function populateReviewArea(stars) {
   });
 }
 
-function computePre(s, i, c=1) {
+function computePre(s, i, c) {
   var I = [s.lastIndexOf('.', i + 1), s.lastIndexOf('?', i + 1), s.lastIndexOf('!', i + 1)];
   I = I.filter(i => i > -1);
   if (I.length === 0) {
@@ -86,7 +86,7 @@ function computePre(s, i, c=1) {
   return computePre(s, max, c-1);
 }
 
-function computePost(s, i, c=1) {
+function computePost(s, i, c) {
   var I = [s.indexOf('.', i + 1), s.indexOf('?', i + 1), s.indexOf('!', i + 1)];
   I = I.filter(i => i > -1);
   if (I.length === 0) {
