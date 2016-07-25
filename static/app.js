@@ -116,11 +116,16 @@ function populateSRA(reviews) {
       reviews[i].review_text = reviews[i].review_text.split('<br>').join('');
       var index = reviews[i].review_text.toLowerCase().indexOf(keyword);
       console.log(index);
-      var pre = computePre(reviews[i].review_text, index);
+      var pre = computePre(reviews[i].review_text, index, 2);
       if (pre == 0) {
         pre = -1;
       }
-      var post = computePost(reviews[i].review_text, index, 2);
+      sens = 1;
+      var post = computePost(reviews[i].review_text, index, sens);
+      if (post - index < 200) {
+        sens += 1;
+        post = computePost(reviews[i].review_text, index, sens);
+      }
       if (post == reviews[i].review_text.length) {
         post -= 1;
       }
